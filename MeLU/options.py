@@ -15,7 +15,7 @@ config = {
     # cuda setting
     'use_cuda': True,
     # model setting
-    'inner': 1,
+    'inner': 5, # update time
     'lr': 5e-5,
     'local_lr': 5e-6,
     'batch_size': 32,
