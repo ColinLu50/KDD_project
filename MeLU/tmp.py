@@ -141,5 +141,20 @@ if __name__ == "__main__":
     # if not os.path.exists("{}/".format(master_path)):
     #     os.mkdir("{}/".format(master_path))
     #     # preparing dataset. It needs about 22GB of your hard disk space.
-    generate_gcn(master_path)
+
+    d1 = json.load(open('./movielens/ml-1m/user_cold_state.json', 'r'))
+    d2 = json.load(open('./movielens/ml-1m/warm_state.json', 'r'))
+
+    items1 = set()
+    for k1 in d1:
+        items1 = items1.union(set(d1[k1]))
+
+    items2 = set()
+    for k2 in d2:
+        items2 = items2.union(set(d2[k2]))
+
+    print(len(items1))
+    print(len(items2))
+
+    print(len(items2 & items1))
 

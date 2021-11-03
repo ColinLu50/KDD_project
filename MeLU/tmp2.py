@@ -1,14 +1,7 @@
+import numpy as np
 
-a = [1, 2]
-b = ['a', 'b']
-c = ['11', '22']
-
-l = list(zip(a, b, c))
-
-print(l)
-
-a, b, c= zip(*l)
-
+a = ['1', '2']
+a = np.array(a)
 print(a)
-print(b)
-print(c)
+a = a.astype(int)
+print(a)
