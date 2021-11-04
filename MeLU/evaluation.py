@@ -10,14 +10,14 @@ from options import config, states
 
 # torch.autograd.set_detect_anomaly(True)
 
-def evaluation_(melu, master_path, topk):
+def evaluation_(melu, master_path, log_name):
     # if not os.path.exists("{}/scores/".format(master_path)):
     #     os.mkdir("{}/scores/".format(master_path))
     if config['use_cuda']:
         melu.cuda()
     melu.eval()
 
-
+    result_str = ''
 
     for target_state in states:
         ndcg1_list = []
@@ -52,7 +52,10 @@ def evaluation_(melu, master_path, topk):
 
 
         print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
+        result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
+    with open(os.path.join(master_path, 'out', log_name), 'w') as f:
+        f.write(result_str + '\n')
 
 
 if __name__ == "__main__":
@@ -60,7 +63,7 @@ if __name__ == "__main__":
 
     # training model.
     melu = MeLU(config)
-    model_filename = "{}/models.pkl".format(master_path)
+    model_filename = "{}/test.pkl".format(master_path)
     if not os.path.exists(model_filename):
         raise Exception(f'Model not exist in {master_path}')
     else:

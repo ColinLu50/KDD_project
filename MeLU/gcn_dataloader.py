@@ -110,14 +110,14 @@ class GCNDataLoader():
         warm_uids = []
         warm_iids = []
 
-        # all_uids = []
-        # all_user_info_ids = []
-        #
-        # all_iids = []
+        all_uids = []
+
+        all_iids = []
         # all_item_info_ids = []
+        # all_user_info_ids = []
 
 
-        self.state_idx2uid = {state: {} for state in states}
+        self.state_idx2ids = {state : [] for state in states}
 
 
         dataset = movielens_1m()
@@ -159,8 +159,8 @@ class GCNDataLoader():
             #     os.mkdir("{}/{}/{}".format(master_path, "log", state))
             with open("{}/{}.json".format(dataset_path, state), encoding="utf-8") as f:
                 dataset = json.loads(f.read())
-            with open("{}/{}_y.json".format(dataset_path, state), encoding="utf-8") as f:
-                dataset_y = json.loads(f.read())
+            # with open("{}/{}_y.json".format(dataset_path, state), encoding="utf-8") as f:
+            #     dataset_y = json.loads(f.read())
 
             for _, user_id in tqdm(enumerate(dataset.keys())):
                 u_id = int(user_id)
@@ -174,7 +174,7 @@ class GCNDataLoader():
                 if seen_movie_len < 13 or seen_movie_len > 100:
                     continue
 
-                self.state_idx2uid[state][idx] = u_id
+                self.state_idx2ids[state].append([[] for _ in range(4)])
 
                 # trainUniqueUsers.append(u_id)
                 # trainUser.extend([u_id] * len(items))
@@ -187,12 +187,40 @@ class GCNDataLoader():
                     if m_id > max_mid:
                         max_mid = m_id
 
+                cur_m_ids = cur_m_ids.astype(int)
                 if state == 'warm_state':
                     warm_uids.extend([u_id] * (len(cur_m_ids) - 10))
-                    warm_iids.extend(cur_m_ids[:-10].astype(int).tolist())
+                    warm_iids.extend(cur_m_ids[:-10].tolist())
 
-        self.n_user = max_uid
-        self.m_item = max_mid
+                self.state_idx2ids[state][idx][0].extend([u_id] * (len(cur_m_ids) - 10)) # support uids
+                self.state_idx2ids[state][idx][1].extend(cur_m_ids[:-10].tolist()) # support mids
+
+                self.state_idx2ids[state][idx][2].extend([u_id] * 10)  # query uids
+                self.state_idx2ids[state][idx][3].extend(cur_m_ids[-10:].tolist()) # query mids
+
+                idx += 1
+
+        self.n_user = max_uid + 1
+        self.m_item = max_mid + 1
+
+        if not os.path.exists("{}/gcn_warm_state/".format(master_path)):
+            for state in states:
+                os.mkdir("{}/gcn_{}/".format(master_path, state))
+
+
+
+            for state in self.state_idx2ids:
+                for idx in tqdm(range(len(self.state_idx2ids[state]))):
+                    support_uid_tensors = self.ids_to_tensors(self.state_idx2ids[state][idx][0], self.n_user)
+                    support_mid_tensors = self.ids_to_tensors(self.state_idx2ids[state][idx][1], self.m_item)
+                    query_uid_tensors = self.ids_to_tensors(self.state_idx2ids[state][idx][2], self.n_user)
+                    query_mid_tensors = self.ids_to_tensors(self.state_idx2ids[state][idx][3], self.m_item)
+
+                    pickle.dump((support_uid_tensors, support_mid_tensors, query_uid_tensors, query_mid_tensors),\
+                                open("{}/gcn_{}/ids_{}.pkl".format(master_path, state, idx), "wb"))
+        else:
+            print('already generate')
+
 
         self.Graph = None
         print(f"{len(warm_iids)} interactions for training")
@@ -200,7 +228,7 @@ class GCNDataLoader():
         # (users,items), bipartite graph
         # user-item interaction matrix R (UserNumber x ItemNumber)
         self.UserItemNet = csr_matrix((np.ones(len(warm_iids)), (warm_uids, warm_iids)),
-                                      shape=(max_uid, max_mid))
+                                      shape=(self.n_user, self.m_item))
 
         self.users_D = np.array(self.UserItemNet.sum(axis=1)).squeeze()
         self.users_D[self.users_D == 0.] = 1 # smooth?
@@ -209,6 +237,21 @@ class GCNDataLoader():
         # pre-calculate
         self._allPos = self.getUserPosItems(list(range(self.n_user)))
         print(f"dataset is ready to go")
+
+
+    def ids_to_tensors(self, ids, max_id):
+        tensor_l = []
+
+        for _id in ids:
+            # _id_onehot = torch.zeros(1, max_id, dtype=torch.long)
+            # _id_onehot[0, _id] = 1
+            # onehot_l.append(_id_onehot)
+            tensor_l.append(_id)
+
+        # assert max(tes_l) < max_id
+
+        return torch.tensor(tensor_l, dtype=torch.long)
+
 
     @property
     def n_users(self):
@@ -252,11 +295,13 @@ class GCNDataLoader():
         data = torch.FloatTensor(coo.data)
         return torch.sparse.FloatTensor(index, data, torch.Size(coo.shape))
 
-    def getSparseGraph(self):
+    def getSparseGraph(self, cache=True):
         print("loading adjacency matrix")
         graph_save_path = os.path.join(self.path, 's_pre_adj_mat.npz')
         if self.Graph is None:
             try:
+                if not cache:
+                    raise Exception()
                 pre_adj_mat = sp.load_npz(graph_save_path)
                 print("successfully loaded...")
                 norm_adj = pre_adj_mat

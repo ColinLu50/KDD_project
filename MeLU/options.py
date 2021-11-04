@@ -15,13 +15,14 @@ config = {
     # cuda setting
     'use_cuda': True,
     # model setting
-    'inner': 5, # update time
+    'inner': 2, # update time
     'lr': 5e-5,
     'local_lr': 5e-6,
     'batch_size': 32,
     'num_epoch': 20,
     # candidate selection
     'num_candidate': 20,
+    'gcn_layer_number' : 3
 }
 
 states = ["warm_state", "user_cold_state", "item_cold_state", "user_and_item_cold_state"]
