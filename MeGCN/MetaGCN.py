@@ -378,6 +378,7 @@ class MetaGCN(torch.nn.Module):
         self.local_update_target_weight_name = ['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias', 'linear_out.weight', 'linear_out.bias']
 
         self.A_hat_train = gcn_dataset.getSparseGraph() # cache=False
+        self.gcn_dataset = gcn_dataset
 
 
     def store_parameters(self):
@@ -406,6 +407,33 @@ class MetaGCN(torch.nn.Module):
                     self.fast_weights[self.weight_name[i]] = weight_for_local_update[i]
         self.model.load_state_dict(self.fast_weights)
         query_set_y_pred = self.model(query_uid, query_iid, self.A_hat_train)
+        self.model.load_state_dict(self.keep_weight)
+        return query_set_y_pred
+
+    def inference(self, support_set_y, support_pair_id, query_pair_id, num_local_update):
+        support_uid, support_iid = support_pair_id[:, 0], support_pair_id[:, 1]
+        query_uid, query_iid = query_pair_id[:, 0], query_pair_id[:, 1]
+
+        # build new hat
+        new_A_hat = self.gcn_dataset.getNewSparseGraph(support_pair_id)
+
+
+        for idx in range(num_local_update):
+            if idx > 0:
+                self.model.load_state_dict(self.fast_weights)
+            weight_for_local_update = list(self.model.state_dict().values())
+            support_set_y_pred = self.model(support_uid, support_iid, new_A_hat)
+            loss = F.mse_loss(support_set_y_pred, support_set_y.view(-1, 1))
+            self.model.zero_grad()
+            grad = torch.autograd.grad(loss, self.model.parameters(), create_graph=True)
+            # local update
+            for i in range(self.weight_len):
+                if self.weight_name[i] in self.local_update_target_weight_name:
+                    self.fast_weights[self.weight_name[i]] = weight_for_local_update[i] - self.local_lr * grad[i]
+                else:
+                    self.fast_weights[self.weight_name[i]] = weight_for_local_update[i]
+        self.model.load_state_dict(self.fast_weights)
+        query_set_y_pred = self.model(query_uid, query_iid, new_A_hat)
         self.model.load_state_dict(self.keep_weight)
         return query_set_y_pred
 
@@ -453,6 +481,7 @@ class MetaGCN(torch.nn.Module):
                 # q_featur_batch[i] = q_featur_batch[i].cuda()
                 q_y_batch[i] = q_y_batch[i].cuda()
 
+        # query
         for i in range(batch_sz):
             query_set_y_pred = self.forward(s_y_batch[i], s_pair_batch[i],
                                             q_pair_batch[i], num_local_update)

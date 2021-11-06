@@ -189,6 +189,51 @@ class GCNDataLoader():
         data = torch.FloatTensor(coo.data)
         return torch.sparse.FloatTensor(index, data, torch.Size(coo.shape))
 
+    def getNewSparseGraph(self, new_u_i_pairs):
+        adj_mat = sp.dok_matrix((self.n_users + self.m_items, self.n_users + self.m_items), dtype=np.float32)
+        adj_mat = adj_mat.tolil()
+
+        update_new_uids = []
+        update_new_iids = []
+        for u_i_pair in new_u_i_pairs:
+            u_id, i_id = u_i_pair
+            if self.UserItemNet[u_id.cpu().numpy(), i_id.cpu().numpy()] == 0:
+                update_new_uids.append(u_id)
+                update_new_iids.append(i_id)
+
+        AddUserItemNet = csr_matrix((np.ones(len(update_new_iids)), (update_new_uids, update_new_iids)),
+                                 shape=(self.n_user, self.m_item))
+
+        R = self.UserItemNet + AddUserItemNet
+        R = R.tolil()
+        # csr_matrix((np.ones(len(warm_iids)), (warm_uids, warm_iids)),
+        #            shape=(self.n_user, self.m_item))
+        # new_norm_
+
+
+        # norm_adj = self.norm_adj
+
+        adj_mat[:self.n_users, self.n_users:] = R
+        adj_mat[self.n_users:, :self.n_users] = R.T
+        adj_mat = adj_mat.todok()
+        # matrix A
+
+        rowsum = np.array(adj_mat.sum(axis=1))
+        with np.errstate(divide='ignore'):
+            d_inv = np.power(rowsum, -0.5).flatten()
+        d_inv[np.isinf(d_inv)] = 0.
+        d_mat = sp.diags(d_inv)
+        # Matrix D^(-1/2)
+
+        norm_adj = d_mat.dot(adj_mat)
+        norm_adj = norm_adj.dot(d_mat)
+        norm_adj = norm_adj.tocsr()
+
+        new_graph = self._convert_sp_mat_to_sp_tensor(norm_adj)
+        return new_graph.coalesce().cuda()
+
+
+
     def getSparseGraph(self, cache=True):
         print("loading adjacency matrix")
         graph_save_path = os.path.join(self.path, 's_pre_adj_mat.npz')
@@ -219,9 +264,12 @@ class GCNDataLoader():
                 norm_adj = d_mat.dot(adj_mat)
                 norm_adj = norm_adj.dot(d_mat)
                 norm_adj = norm_adj.tocsr()
+
                 end = time()
                 print(f"costing {end -s}s, saved norm_mat...")
                 sp.save_npz(graph_save_path, norm_adj)
+
+            self.norm_adj = norm_adj
 
             if self.split == True:
                 self.Graph = self._split_A_hat(norm_adj)

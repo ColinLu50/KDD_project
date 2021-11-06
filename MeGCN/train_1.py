@@ -56,6 +56,9 @@ if __name__ == "__main__":
 
     # training model.
     ml_dataset = GCNDataLoader(master_path)
+    # ml_dataset.getNewSparseGraph(torch.Tensor([[0, 0], [4, 21]]))
+    # exit(0)
+
     megcn = MetaGCN(config, ml_dataset)
     model_filename = "{}/test_MetaGCN.pkl".format(master_path)
 

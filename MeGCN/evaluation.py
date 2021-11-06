@@ -23,6 +23,9 @@ def evaluation_(megcn, master_path, log_name):
     result_str = ''
 
     for target_state in states:
+        if target_state == 'warm_state':
+            continue
+
         ndcg1_list = []
         ndcg3_list = []
         ndcg5_list = []
@@ -42,7 +45,7 @@ def evaluation_(megcn, master_path, log_name):
             #         item_id = line.strip().split()[1]
             #         item_ids.append(item_id)
 
-            query_y_pred = megcn.forward(support_ys, support_pair_id, query_pair_id, config['inner']) #config['inner']
+            query_y_pred = megcn.inference(support_ys, support_pair_id, query_pair_id, config['inner']) #config['inner']
             query_y_pred = query_y_pred.view(1, -1).cpu().detach().numpy()
             ndcg1 = ndcg_score(query_ys.view(1, -1).numpy(), query_y_pred, k=1)
             ndcg1_list.append(ndcg1)
@@ -75,12 +78,14 @@ if __name__ == "__main__":
 
     # training model.
     ml_dataset = GCNDataLoader(master_path)
-    # melu = MetaGCN(config, ml_dataset)
+    ml_dataset.getSparseGraph(cache=False)
+    megcn = MetaGCN(config, ml_dataset)
     model_filename = "{}/test_MetaGCN.pkl".format(master_path)
     if not os.path.exists(model_filename):
         raise Exception(f'Model not exist in {master_path}')
     else:
-        megcn = torch.load(model_filename)
+        pass
+        # megcn = torch.load(model_filename)
         # melu.load_state_dict(trained_state_dict)
 
     evaluation_(megcn, master_path, 'megcn_2_simple')
