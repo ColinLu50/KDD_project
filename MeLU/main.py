@@ -8,11 +8,9 @@ from model_training import training
 from data_generation import generate
 from evidence_candidate import selection
 
-# torch.autograd.set_detect_anomaly(True)
-
 
 if __name__ == "__main__":
-    master_path= "/home/workspace/big_data/KDD_projects_data/ml1m"
+    master_path= "./ml"
     if not os.path.exists("{}/".format(master_path)):
         os.mkdir("{}/".format(master_path))
         # preparing dataset. It needs about 22GB of your hard disk space.

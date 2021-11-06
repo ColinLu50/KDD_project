@@ -10,6 +10,7 @@ from tqdm import tqdm
 from options import states
 from dataset import movielens_1m
 
+random.seed(1)
 
 def item_converting(row, rate_list, genre_list, director_list, actor_list):
     rate_idx = torch.tensor([[rate_list.index(str(row['rate']))]]).long()
@@ -105,7 +106,7 @@ def generate(master_path):
             support_x_app = None
             for m_id in tmp_x[indices[:-10]]:
                 m_id = int(m_id)
-                tmp_x_converted = torch.cat((movie_dict[m_id], user_dict[u_id]), 1) # concatenate embedding of movie info and user info
+                tmp_x_converted = torch.cat((movie_dict[m_id], user_dict[u_id]), 1)
                 try:
                     support_x_app = torch.cat((support_x_app, tmp_x_converted), 0)
                 except:
@@ -134,7 +135,3 @@ def generate(master_path):
                 for m_id in tmp_x[indices[-10:]]:
                     f.write("{}\t{}\n".format(u_id, m_id))
             idx += 1
-
-
-
-
