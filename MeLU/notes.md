@@ -18,7 +18,15 @@ Task user_cold_state, NDCG1:  0.7715, nDCG3:  0.7999 NDCG5:  0.8299, nDCG10:  0.
 Task item_cold_state, NDCG1:  0.7653, nDCG3:  0.7886 NDCG5:  0.8204, nDCG10:  0.9226
 Task user_and_item_cold_state, NDCG1:  0.7790, nDCG3:  0.7925 NDCG5:  0.8222, nDCG10:  0.9244
 
+MeLU-5
 Task warm_state, NDCG1:  0.8815, nDCG3:  0.8857 NDCG5:  0.8999, nDCG10:  0.9594
 Task user_cold_state, NDCG1:  0.8716, nDCG3:  0.8765 NDCG5:  0.8890, nDCG10:  0.9556
 Task item_cold_state, NDCG1:  0.7856, nDCG3:  0.8069 NDCG5:  0.8330, nDCG10:  0.9290
 Task user_and_item_cold_state, NDCG1:  0.7778, nDCG3:  0.8024 NDCG5:  0.8286, nDCG10:  0.9276
+
+
+Reptile Method:
+Task warm_state, NDCG1:  0.7776, nDCG3:  0.8023 NDCG5:  0.8300, nDCG10:  0.9290
+Task user_cold_state, NDCG1:  0.7831, nDCG3:  0.8075 NDCG5:  0.8331, nDCG10:  0.9309
+Task item_cold_state, NDCG1:  0.7434, nDCG3:  0.7712 NDCG5:  0.8048, nDCG10:  0.9163
+Task user_and_item_cold_state, NDCG1:  0.7438, nDCG3:  0.7717 NDCG5:  0.8080, nDCG10:  0.9174

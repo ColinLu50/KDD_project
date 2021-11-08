@@ -4,7 +4,7 @@ config = {
     'num_genre': 25,
     'num_director': 2186,
     'num_actor': 8030,
-    'embedding_dim': 64,
+    'embedding_dim': 32,
     'first_fc_hidden_dim': 64,
     'second_fc_hidden_dim': 64,
     # user

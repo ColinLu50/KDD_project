@@ -2,7 +2,7 @@ import os
 import torch
 import pickle
 
-from MetaGCN import MetaGCN
+from MetaGCN_v2 import MetaGCN
 from gcn_dataloader import GCNDataLoader
 from options import config
 from tmp import training

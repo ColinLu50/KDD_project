@@ -2,7 +2,7 @@ import os
 import torch
 import pickle
 
-from MetaGCN_v1 import MetaGCN
+from MetaGCN_v2 import MetaGCN
 from gcn_dataloader import GCNDataLoader
 from options import config
 from data_generation_megcn import generate_one_hot
@@ -42,7 +42,7 @@ def training(model_, total_dataset, batch_size, num_epoch, model_save=True, mode
             batch_data = (s_pair_batch, s_featur_batch, s_y_batch,
                           q_pair_batch, q_featur_batch, q_y_batch)
 
-            model_.global_update_MAML(batch_data, config['inner'])
+            model_.global_update(batch_data, config['inner'])
 
     if model_save:
         torch.save(model_, model_filename)
@@ -51,8 +51,7 @@ if __name__ == "__main__":
     master_path= "/home/workspace/big_data/KDD_projects_data/ml1m_test"
     if not os.path.exists("{}/".format(master_path)):
         os.mkdir("{}/".format(master_path))
-        # preparing dataset. It needs about 22GB of your hard disk space.
-        generate_one_hot(master_path)
+        generate_one_hot(master_path) # preparing dataset. It needs about 22GB of your hard disk space.
 
     # training model.
     ml_dataset = GCNDataLoader(master_path)
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     # exit(0)
 
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/test_MetaGCN.pkl".format(master_path)
+    model_filename = "{}/MetaGCN_v2.pkl".format(master_path)
 
     # Load training dataset.
     training_set_size = ml_dataset.state_size['warm_state']
@@ -89,7 +88,7 @@ if __name__ == "__main__":
     del (support_pairs_list, support_features_list, support_ys_list,
             query_pairs_list, query_features_list,query_ys_list)
 
-    training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
-    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
+    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
+    training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
 
-    evaluation_(megcn, master_path, 'megcn_2_simple')
+    # evaluation_(megcn, master_path, 'megcn_v2')

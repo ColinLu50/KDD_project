@@ -234,10 +234,14 @@ class MetaGCN(torch.nn.Module):
         super(MetaGCN, self).__init__()
         self.use_cuda = config['use_cuda']
         self.model = GCN_Estimator(config, gcn_dataset)
+        if self.use_cuda:
+            self.model.cuda()
+
+
         self.local_lr = config['local_lr']
+        self.meta_lr = config['lr']
         self.store_parameters()
-        self.meta_optim = torch.optim.Adam(self.model.parameters(), lr=config['lr'])
-        # TODO: change name
+
         self.local_update_target_weight_name = ['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias', 'linear_out.weight', 'linear_out.bias']
 
         self.A_hat_train = gcn_dataset.getSparseGraph() # cache=False
@@ -300,7 +304,32 @@ class MetaGCN(torch.nn.Module):
         self.model.load_state_dict(self.keep_weight)
         return query_set_y_pred
 
+    def local_update(self, support_set_y, support_pair_id, num_local_update):
+        # SGD
+        support_uid, support_iid = support_pair_id[:, 0], support_pair_id[:, 1]
+
+        for idx in range(num_local_update):
+            if idx > 0:
+                self.model.load_state_dict(self.fast_weights)
+            weight_for_local_update = list(self.model.state_dict().values())
+            support_set_y_pred = self.model(support_uid, support_iid, self.A_hat_train)
+            loss = F.mse_loss(support_set_y_pred, support_set_y.view(-1, 1))
+            self.model.zero_grad()
+            grad = torch.autograd.grad(loss, self.model.parameters(), create_graph=True)
+            # local update
+            for i in range(self.weight_len):
+                # if self.weight_name[i] in self.local_update_target_weight_name:
+                #     self.fast_weights[self.weight_name[i]] = weight_for_local_update[i] - self.local_lr * grad[i]
+                # else:
+                #     self.fast_weights[self.weight_name[i]] = weight_for_local_update[i]
+                self.fast_weights[self.weight_name[i]] = weight_for_local_update[i] - self.local_lr * grad[i]
+
+
+
+        return self.fast_weights
+
     def global_update(self, batch_data, num_local_update):
+        # reptile
 
         (s_pair_batch, s_featur_batch, s_y_batch,
          q_pair_batch, q_featur_batch, q_y_batch) = batch_data
@@ -317,16 +346,15 @@ class MetaGCN(torch.nn.Module):
                 # q_featur_batch[i] = q_featur_batch[i].cuda()
                 q_y_batch[i] = q_y_batch[i].cuda()
 
-        # query
+        new_weights = deepcopy(self.keep_weight)
         for i in range(batch_sz):
-            query_set_y_pred = self.forward(s_y_batch[i], s_pair_batch[i],
-                                            q_pair_batch[i], num_local_update)
-            loss_q = F.mse_loss(query_set_y_pred, q_y_batch[i].view(-1, 1))
-            losses_q.append(loss_q)
-        losses_q = torch.stack(losses_q).mean(0)
-        self.meta_optim.zero_grad()
-        losses_q.backward()
-        self.meta_optim.step()
+            local_weights = self.local_update(s_y_batch[i], s_pair_batch[i], num_local_update)
+            for i in range(self.weight_len):
+                weight_name_ = self.weight_name[i]
+                new_weights[weight_name_] += (local_weights[weight_name_] - self.keep_weight[weight_name_]) * (
+                            self.local_lr / batch_sz)
+
+        self.model.load_state_dict(new_weights)
         self.store_parameters()
         return
 

@@ -125,7 +125,7 @@ class MeLU(torch.nn.Module):
     #     self.store_parameters()
     #     return
 
-    def global_update(self, support_set_xs, support_set_ys, query_set_xs, query_set_ys, num_local_update):
+    def global_update(self, support_set_xs, support_set_ys, query_set_xs, query_set_ys, num_local_update, lr_rate):
         batch_sz = len(support_set_xs)
         if self.use_cuda:
             for i in range(batch_sz):
@@ -136,11 +136,12 @@ class MeLU(torch.nn.Module):
 
         new_weights = deepcopy(self.keep_weight)
 
+        cur_mete_lr = self.meta_lr * lr_rate
         for i in range(batch_sz):
             local_weights = self.local_update(support_set_xs[i], support_set_ys[i], num_local_update)
             for i in range(self.weight_len):
                 weight_name_ = self.weight_name[i]
-                new_weights[weight_name_] += (local_weights[weight_name_] - self.keep_weight[weight_name_]) * (self.local_lr / batch_sz)
+                new_weights[weight_name_] += (local_weights[weight_name_] - self.keep_weight[weight_name_]) * (cur_mete_lr / batch_sz)
 
 
         # update model parameter

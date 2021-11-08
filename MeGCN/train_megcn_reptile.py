@@ -2,9 +2,8 @@ import os
 import torch
 import pickle
 
-from MetaGCN_v1 import MetaGCN
+from MetaGCN_reptile import MetaGCN
 from gcn_dataloader import GCNDataLoader
-from options import config
 from data_generation_megcn import generate_one_hot
 from evaluation import evaluation_
 
@@ -13,6 +12,33 @@ import torch
 import random
 import pickle
 from tqdm import tqdm
+
+config = {
+    # item
+    'num_rate': 6,
+    'num_genre': 25,
+    'num_director': 2186,
+    'num_actor': 8030,
+    'embedding_dim': 64,
+    'first_fc_hidden_dim': 64,
+    'second_fc_hidden_dim': 64,
+    # user
+    'num_gender': 2,
+    'num_age': 7,
+    'num_occupation': 21,
+    'num_zipcode': 3402,
+    # cuda setting
+    'use_cuda': True,
+    # model setting
+    'inner': 8, # update time
+    'lr': 5e-5,
+    'local_lr': 5e-6,
+    'batch_size': 32,
+    'num_epoch': 20,
+    # candidate selection
+    'num_candidate': 20,
+    'gcn_layer_number' : 3
+}
 
 def training(model_, total_dataset, batch_size, num_epoch, model_save=True, model_filename=None):
     if config['use_cuda']:
@@ -42,7 +68,7 @@ def training(model_, total_dataset, batch_size, num_epoch, model_save=True, mode
             batch_data = (s_pair_batch, s_featur_batch, s_y_batch,
                           q_pair_batch, q_featur_batch, q_y_batch)
 
-            model_.global_update_MAML(batch_data, config['inner'])
+            model_.global_update(batch_data, config['inner'])
 
     if model_save:
         torch.save(model_, model_filename)
@@ -60,7 +86,7 @@ if __name__ == "__main__":
     # exit(0)
 
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/test_MetaGCN.pkl".format(master_path)
+    model_filename = "{}/MeGCN_reptile.pkl".format(master_path)
 
     # Load training dataset.
     training_set_size = ml_dataset.state_size['warm_state']
@@ -89,7 +115,7 @@ if __name__ == "__main__":
     del (support_pairs_list, support_features_list, support_ys_list,
             query_pairs_list, query_features_list,query_ys_list)
 
-    training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
-    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
+    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
+    training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
 
-    evaluation_(megcn, master_path, 'megcn_2_simple')
+    evaluation_(megcn, master_path, 'megcn_reptile_simple')

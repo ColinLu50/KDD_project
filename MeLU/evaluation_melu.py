@@ -55,6 +55,9 @@ def evaluation_(melu, master_path, log_name):
         print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
         result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
+    print('=' * 30)
+    print(result_str)
+
     result_log_folder = os.path.join(master_path, 'out')
     if not os.path.exists(result_log_folder):
         os.makedirs(result_log_folder)

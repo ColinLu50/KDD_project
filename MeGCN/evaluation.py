@@ -23,8 +23,6 @@ def evaluation_(megcn, master_path, log_name):
     result_str = ''
 
     for target_state in states:
-        if target_state == 'warm_state':
-            continue
 
         ndcg1_list = []
         ndcg3_list = []
@@ -72,7 +70,7 @@ def evaluation_(megcn, master_path, log_name):
 
 
 if __name__ == "__main__":
-    from MetaGCN import MetaGCN
+    from MetaGCN_v2 import MetaGCN
     from gcn_dataloader import GCNDataLoader
     master_path= "/home/workspace/big_data/KDD_projects_data/ml1m_test"
 

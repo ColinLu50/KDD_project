@@ -11,7 +11,7 @@ from tqdm import tqdm
 from options import states
 from dataset import movielens_1m
 from gcn_dataloader import GCNDataLoader
-from MetaGCN import MetaGCN
+from MetaGCN_v2 import MetaGCN
 from options import config
 from evaluation import evaluation_
 
