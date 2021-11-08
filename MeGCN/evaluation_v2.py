@@ -32,7 +32,10 @@ def evaluation_(megcn, master_path, log_name):
         for idx in tqdm(list(range(dataset_size))):
 
             support_ys = pickle.load(open("{}/{}/supp_y_{}.pkl".format(master_path, target_state, idx), "rb")).cuda()
+            support_features = pickle.load(open("{}/{}/supp_f_{}.pkl".format(master_path, target_state, idx), "rb"))
             support_pair_id = pickle.load(open("{}/{}/supp_pairs_{}.pkl".format(master_path, target_state, idx), "rb")).cuda()
+
+            query_features = pickle.load(open("{}/{}/query_f_{}.pkl".format(master_path, target_state, idx), "rb"))
             query_pair_id = pickle.load(open("{}/{}/query_pairs_{}.pkl".format(master_path, target_state, idx), "rb")).cuda()
             query_ys = pickle.load(open("{}/{}/query_y_{}.pkl".format(master_path, target_state, idx), "rb"))
 
@@ -43,7 +46,7 @@ def evaluation_(megcn, master_path, log_name):
             #         item_id = line.strip().split()[1]
             #         item_ids.append(item_id)
 
-            query_y_pred = megcn.inference(support_ys, support_pair_id, query_pair_id, config['inner']) #config['inner']
+            query_y_pred = megcn.inference(support_ys, support_features, support_pair_id, query_features, query_pair_id, config['inner']) #config['inner']
             query_y_pred = query_y_pred.view(1, -1).cpu().detach().numpy()
             ndcg1 = ndcg_score(query_ys.view(1, -1).numpy(), query_y_pred, k=1)
             ndcg1_list.append(ndcg1)
@@ -60,7 +63,6 @@ def evaluation_(megcn, master_path, log_name):
         print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
         result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
-    print(result_str)
 
     file_path = os.path.join(master_path, 'out', log_name)
     if not os.path.exists(os.path.dirname(file_path)):
@@ -83,8 +85,7 @@ if __name__ == "__main__":
     if not os.path.exists(model_filename):
         raise Exception(f'Model not exist in {master_path}')
     else:
-
         megcn = torch.load(model_filename)
         # melu.load_state_dict(trained_state_dict)
 
-    evaluation_(megcn, master_path, 'megcn_2_simple')
+    evaluation_(megcn, master_path, 'megcn_v2_new_inference')

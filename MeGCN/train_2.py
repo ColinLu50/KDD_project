@@ -4,7 +4,6 @@ import pickle
 
 from MetaGCN_v2 import MetaGCN
 from gcn_dataloader import GCNDataLoader
-from options import config
 from data_generation_megcn import generate_one_hot
 from evaluation import evaluation_
 
@@ -13,6 +12,39 @@ import torch
 import random
 import pickle
 from tqdm import tqdm
+
+
+
+random.seed(0)
+
+config = {
+    # item
+    'num_rate': 6,
+    'num_genre': 25,
+    'num_director': 2186,
+    'num_actor': 8030,
+    'embedding_dim': 32,
+    'first_fc_hidden_dim': 80,
+    'second_fc_hidden_dim': 80,
+    # user
+    'num_gender': 2,
+    'num_age': 7,
+    'num_occupation': 21,
+    'num_zipcode': 3402,
+    # cuda setting
+    'use_cuda': True,
+    # model setting
+    'inner': 5, # update time
+    'lr': 5e-5,
+    'local_lr': 5e-6,
+    'batch_size': 32,
+    'num_epoch': 20,
+    # candidate selection
+    'num_candidate': 20,
+    'gcn_layer_number' : 3
+}
+
+
 
 def training(model_, total_dataset, batch_size, num_epoch, model_save=True, model_filename=None):
     if config['use_cuda']:
@@ -59,7 +91,7 @@ if __name__ == "__main__":
     # exit(0)
 
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/MetaGCN_v2.pkl".format(master_path)
+    model_filename = "{}/MetaGCN_v2_wdecay.pkl".format(master_path)
 
     # Load training dataset.
     training_set_size = ml_dataset.state_size['warm_state']
@@ -88,7 +120,7 @@ if __name__ == "__main__":
     del (support_pairs_list, support_features_list, support_ys_list,
             query_pairs_list, query_features_list,query_ys_list)
 
-    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
-    training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
+    training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
+    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
 
-    # evaluation_(megcn, master_path, 'megcn_v2')
+    evaluation_(megcn, master_path, 'megcn_v2_wdecay')

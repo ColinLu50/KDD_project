@@ -1,0 +1,23 @@
+/home/workspace/KDD_project/MeGCN/gcn_dataloader.py:259: RuntimeWarning: divide by zero encountered in power
+  d_inv = np.power(rowsum, -0.5).flatten()
+/opt/conda/envs/torch1_4/lib/python3.8/site-packages/torch/serialization.py:593: SourceChangeWarning: source code of class 'MetaGCN_v2.MetaGCN' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+/opt/conda/envs/torch1_4/lib/python3.8/site-packages/torch/serialization.py:593: SourceChangeWarning: source code of class 'MetaGCN_v2.GCN_Estimator' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  warnings.warn(msg, SourceChangeWarning)
+loading from [movielens/ml-1m]
+95281 interactions for training
+dataset is ready to go
+loading adjacency matrix
+generating adjacency matrix
+costing 1.7811694145202637s, saved norm_mat...
+don't split the matrix
+loading adjacency matrix
+  0%|          | 0/2653 [00:00<?, ?it/s]  0%|          | 0/2653 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "evaluation_v2.py", line 91, in <module>
+    evaluation_(megcn, master_path, 'megcn_v2_new_inference')
+  File "evaluation_v2.py", line 49, in evaluation_
+    query_y_pred = megcn.inference(support_ys, support_features, support_pair_id, query_features, query_pair_id, config['inner']) #config['inner']
+  File "/home/workspace/KDD_project/MeGCN/MetaGCN_v2.py", line 298, in inference
+    new_A_hat = self.gcn_dataset.getNewSparseGraph(support_pair_id + query_pair_id)
+RuntimeError: The size of tensor a (28) must match the size of tensor b (10) at non-singleton dimension 0

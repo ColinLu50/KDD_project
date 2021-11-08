@@ -13,7 +13,7 @@ class GCN_Estimator(torch.nn.Module):
     def __init__(self, config, gcn_dataset):
         super(GCN_Estimator, self).__init__()
         self.embedding_dim = config['embedding_dim']
-        self.fc1_in_dim = config['embedding_dim'] * 8
+        self.fc1_in_dim = config['embedding_dim'] * 10
         self.fc2_in_dim = config['first_fc_hidden_dim']
         self.fc2_out_dim = config['second_fc_hidden_dim']
         self.use_cuda = config['use_cuda']
@@ -170,6 +170,8 @@ class GCN_Estimator(torch.nn.Module):
         #     for iid in warm_item_ids:
         #         self.embedding_all_item[iid] = torch.nn.Parameter(torch.ones(self.embedding_dim).cuda())
 
+    def get_init_emb(self, user_ids, item_ids):
+        return self.user_gcn_emb(user_ids), self.item_gcn_emb(item_ids)
 
 
 
@@ -196,24 +198,38 @@ class GCN_Estimator(torch.nn.Module):
 
         split_user_features = []
         for f_idx in range(self.num_u_feature):
-            cur_f_emb_ = self.user_embeddings[f_idx](user_features[f_idx])
+            cur_mask = []
+            for cur_feature in user_features:
+                cur_mask.append(cur_feature[f_idx])
+            cur_mask = torch.cat(cur_mask, dim=0).float()
+            if self.use_cuda:
+                cur_mask = cur_mask.cuda()
+
+            cur_f_emb_ = self.user_feature_embeddings[f_idx](cur_mask)
             split_user_features.append(cur_f_emb_)
 
         emb_all_user_features = torch.cat(split_user_features, dim=1)
 
         split_item_features = []
         for f_idx in range(self.num_i_feature):
-            cur_f_emb_ = self.item_embeddings[f_idx](item_features[f_idx])
+            cur_mask = []
+            for cur_feature in item_features:
+                cur_mask.append(cur_feature[f_idx])
+            cur_mask = torch.cat(cur_mask, dim=0).float()
+            if self.use_cuda:
+                cur_mask = cur_mask.cuda()
+
+            cur_f_emb_ = self.item_feature_embeddings[f_idx](cur_mask)
             split_item_features.append(cur_f_emb_)
 
-        emb_all_item_features = torch.cat(split_user_features, dim=1)
+        emb_all_item_features = torch.cat(split_item_features, dim=1)
 
 
 
         # do combination
 
 
-        X = torch.cat((user_gcn_emb, item_gcn_emb), 1)
+        X = torch.cat((emb_all_user_features, user_gcn_emb, emb_all_item_features, item_gcn_emb), 1)
 
 
         X = self.fc1(X)
@@ -234,7 +250,9 @@ class MetaGCN(torch.nn.Module):
         self.store_parameters()
         self.meta_optim = torch.optim.Adam(self.model.parameters(), lr=config['lr'])
         # TODO: change name
-        self.local_update_target_weight_name = ['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias', 'linear_out.weight', 'linear_out.bias']
+        self.local_update_target_weight_name = ['user_gcn_emb.weight', 'item_gcn_emb.weight',
+                                                'fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias',
+                                                'linear_out.weight', 'linear_out.bias']
 
         self.A_hat_train = gcn_dataset.getSparseGraph() # cache=False
         self.gcn_dataset = gcn_dataset
@@ -247,11 +265,11 @@ class MetaGCN(torch.nn.Module):
         self.fast_weights = OrderedDict()
 
     def forward(self, support_set_y, support_features, support_pair_id, query_features, query_pair_id, num_local_update):
-        supp_user_features = support_features[0]
-        supp_item_features = support_features[1]
+        supp_user_features = [f[0] for f in support_features]
+        supp_item_features = [f[1] for f in support_features]
 
-        query_user_feature = query_features[0]
-        query_item_feature = query_features[1]
+        query_user_feature = [f[0] for f in query_features]
+        query_item_feature = [f[1] for f in query_features]
 
         support_uid, support_iid = support_pair_id[:, 0], support_pair_id[:, 1]
         query_uid, query_iid = query_pair_id[:, 0], query_pair_id[:, 1]
@@ -275,19 +293,25 @@ class MetaGCN(torch.nn.Module):
         self.model.load_state_dict(self.keep_weight)
         return query_set_y_pred
 
-    def inference(self, support_set_y, support_pair_id, query_pair_id, num_local_update):
+    def inference(self, support_set_y, support_features, support_pair_id, query_features, query_pair_id, num_local_update):
+        # build new hat
+        new_A_hat = self.gcn_dataset.getNewSparseGraph(torch.cat([support_pair_id, query_pair_id]))
+
+        supp_user_features = [f[0] for f in support_features]
+        supp_item_features = [f[1] for f in support_features]
+
+        query_user_feature = [f[0] for f in query_features]
+        query_item_feature = [f[1] for f in query_features]
+
         support_uid, support_iid = support_pair_id[:, 0], support_pair_id[:, 1]
         query_uid, query_iid = query_pair_id[:, 0], query_pair_id[:, 1]
-
-        # build new hat
-        new_A_hat = self.gcn_dataset.getNewSparseGraph(support_pair_id)
-
 
         for idx in range(num_local_update):
             if idx > 0:
                 self.model.load_state_dict(self.fast_weights)
             weight_for_local_update = list(self.model.state_dict().values())
-            support_set_y_pred = self.model(support_uid, support_iid, new_A_hat)
+            support_set_y_pred = self.model(supp_user_features, supp_item_features, support_uid, support_iid,
+                                            new_A_hat)
             loss = F.mse_loss(support_set_y_pred, support_set_y.view(-1, 1))
             self.model.zero_grad()
             grad = torch.autograd.grad(loss, self.model.parameters(), create_graph=True)
@@ -298,9 +322,20 @@ class MetaGCN(torch.nn.Module):
                 else:
                     self.fast_weights[self.weight_name[i]] = weight_for_local_update[i]
         self.model.load_state_dict(self.fast_weights)
-        query_set_y_pred = self.model(query_uid, query_iid, new_A_hat)
+        query_set_y_pred = self.model(query_user_feature, query_item_feature, query_uid, query_iid, new_A_hat)
         self.model.load_state_dict(self.keep_weight)
         return query_set_y_pred
+
+    def get_weights_decay_loss(self, query_pair_id):
+        # support_uid, support_iid = support_pair_id[:, 0], support_pair_id[:, 1]
+        query_uid, query_iid = query_pair_id[:, 0], query_pair_id[:, 1]
+        user_emb0, item_emb0 = self.model.get_init_emb(query_uid, query_iid)
+
+        weight_decay_loss = (1/2)*(user_emb0.norm(2).pow(2) + item_emb0.norm(2).pow(2))/float(query_iid.shape[0])
+
+        return weight_decay_loss
+
+
 
     def global_update(self, batch_data, num_local_update):
 
@@ -319,11 +354,13 @@ class MetaGCN(torch.nn.Module):
                 # q_featur_batch[i] = q_featur_batch[i].cuda()
                 q_y_batch[i] = q_y_batch[i].cuda()
 
-        # support query
+
         for i in range(batch_sz):
             query_set_y_pred = self.forward(s_y_batch[i], s_featur_batch[i], s_pair_batch[i],
                                             q_featur_batch[i], q_pair_batch[i], num_local_update)
-            loss_q = F.mse_loss(query_set_y_pred, q_y_batch[i].view(-1, 1))
+            # TODO: get weight decay
+
+            loss_q = F.mse_loss(query_set_y_pred, q_y_batch[i].view(-1, 1)) + self.get_weights_decay_loss(q_pair_batch[i])
             losses_q.append(loss_q)
         losses_q = torch.stack(losses_q).mean(0)
         self.meta_optim.zero_grad()
