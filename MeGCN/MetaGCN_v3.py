@@ -13,7 +13,7 @@ class GCN_Estimator(torch.nn.Module):
     def __init__(self, config, gcn_dataset):
         super(GCN_Estimator, self).__init__()
         self.embedding_dim = config['embedding_dim']
-        self.fc1_in_dim = config['embedding_dim'] * 8
+        self.fc1_in_dim = config['embedding_dim'] * 10
         self.fc2_in_dim = config['first_fc_hidden_dim']
         self.fc2_out_dim = config['second_fc_hidden_dim']
         self.use_cuda = config['use_cuda']
@@ -40,27 +40,24 @@ class GCN_Estimator(torch.nn.Module):
         #     bias=False
         # )
         self.user_gcn_emb = torch.nn.Embedding(
-            num_embeddings=self.num_users, embedding_dim=self.embedding_dim * 2
+            num_embeddings=self.num_users, embedding_dim=self.embedding_dim
         )
-        torch.nn.init.normal_(self.user_gcn_emb.weight, std=0.1)
         self.item_gcn_emb = torch.nn.Embedding(
-            num_embeddings=self.num_items, embedding_dim=self.embedding_dim * 2
+            num_embeddings=self.num_items, embedding_dim=self.embedding_dim
         )
-        torch.nn.init.normal_(self.item_gcn_emb.weight, std=0.1)
 
-        # # init other with zero
-        # with torch.no_grad():
-        #     warm_uids = set(self.gcn_dataset.warm_user_ids)
-        #
-        #     for u_id in range(self.num_users):
-        #         if u_id not in warm_uids:
-        #             self.user_gcn_emb.weight[u_id, :] = 0
-        #
-        #     warm_iids = set(self.gcn_dataset.warm_item_ids)
-        #
-        #     for i_id in range(self.num_items):
-        #         if i_id not in warm_iids:
-        #             self.item_gcn_emb.weight[i_id, :] = 0
+        with torch.no_grad():
+            warm_uids = set(self.gcn_dataset.warm_user_ids)
+
+            for u_id in range(self.num_users):
+                if u_id not in warm_uids:
+                    self.user_gcn_emb.weight[u_id, :] = 0
+
+            warm_iids = set(self.gcn_dataset.warm_item_ids)
+
+            for i_id in range(self.num_items):
+                if i_id not in warm_iids:
+                    self.item_gcn_emb.weight[i_id, :] = 0
 
 
         tmp_f = gcn_dataset.user_dict[gcn_dataset.warm_user_ids[0]]
@@ -99,13 +96,11 @@ class GCN_Estimator(torch.nn.Module):
         self.item_feature_embeddings = torch.nn.ModuleList(self.item_feature_embeddings)
 
 
-        # feature forward model
+        # model
+
         self.fc1 = torch.nn.Linear(self.fc1_in_dim, self.fc2_in_dim)
         self.fc2 = torch.nn.Linear(self.fc2_in_dim, self.fc2_out_dim)
         self.linear_out = torch.nn.Linear(self.fc2_out_dim, 1)
-
-        # GCN forward model
-        self.final_linear_out = torch.nn.Linear(2, 1)
 
         self.gcn_layer_number = config['gcn_layer_number']
 
@@ -211,9 +206,6 @@ class GCN_Estimator(torch.nn.Module):
 
         user_gcn_emb = all_users_gcn_emb[user_ids]
         item_gcn_emb = all_items_gcn_emb[item_ids]
-        inner_product = torch.mul(user_gcn_emb, item_gcn_emb)
-
-        gcn_outputs = torch.sum(inner_product, dim=1)
 
         split_user_features = []
         for f_idx in range(self.num_u_feature):
@@ -245,20 +237,17 @@ class GCN_Estimator(torch.nn.Module):
 
 
 
-        # feature forward
-        X = torch.cat((emb_all_user_features, emb_all_item_features), 1)
+        # do combination
+
+
+        X = torch.cat((emb_all_user_features, user_gcn_emb, emb_all_item_features, item_gcn_emb), 1)
+
+
         X = self.fc1(X)
         X = F.relu(X)
         X = self.fc2(X)
         X = F.relu(X)
-        X_feature = self.linear_out(X)
-
-        # combine
-        X = self.final_linear_out(torch.cat([X_feature, gcn_outputs.unsqueeze(1)], dim=1))
-
-
-
-        return X
+        return self.linear_out(X)
 
 
 
@@ -277,8 +266,7 @@ class MetaGCN(torch.nn.Module):
         #                                         'linear_out.weight', 'linear_out.bias']
 
         self.local_update_target_weight_name = ['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias',
-                                                'linear_out.weight', 'linear_out.bias',
-                                                'final_linear_out.weight', 'final_linear_out.bias']
+                                                'linear_out.weight', 'linear_out.bias']
 
         self.A_hat_train = gcn_dataset.getSparseGraph() # cache=False
         self.gcn_dataset = gcn_dataset

@@ -18,6 +18,19 @@ Task user_cold_state, NDCG1:  0.7715, nDCG3:  0.7999 NDCG5:  0.8299, nDCG10:  0.
 Task item_cold_state, NDCG1:  0.7653, nDCG3:  0.7886 NDCG5:  0.8204, nDCG10:  0.9226
 Task user_and_item_cold_state, NDCG1:  0.7790, nDCG3:  0.7925 NDCG5:  0.8222, nDCG10:  0.9244
 
+MeGCN_V2 平行增加 32 user and item embedding.
+Task warm_state, NDCG1:  0.8877, nDCG3:  0.8905 NDCG5:  0.9043, nDCG10:  0.9611
+Task user_cold_state, NDCG1:  0.8787, nDCG3:  0.8826 NDCG5:  0.8937, nDCG10:  0.9576
+Task item_cold_state, NDCG1:  0.7593, nDCG3:  0.7805 NDCG5:  0.8104, nDCG10:  0.9198
+Task user_and_item_cold_state, NDCG1:  0.7626, nDCG3:  0.7790 NDCG5:  0.8086, nDCG10:  0.9193
+
+MeGCN_V2 + WeightDecay + Local更新GCN emb + inference 更新Sup/Query
+Task warm_state, NDCG1:  0.8840, nDCG3:  0.8907 NDCG5:  0.9039, nDCG10:  0.9608
+Task user_cold_state, NDCG1:  0.8798, nDCG3:  0.8835 NDCG5:  0.8935, nDCG10:  0.9577
+Task item_cold_state, NDCG1:  0.7526, nDCG3:  0.7817 NDCG5:  0.8118, nDCG10:  0.9197
+Task user_and_item_cold_state, NDCG1:  0.7504, nDCG3:  0.7781 NDCG5:  0.8093, nDCG10:  0.9185
+
+
 MeLU-5
 Task warm_state, NDCG1:  0.8815, nDCG3:  0.8857 NDCG5:  0.8999, nDCG10:  0.9594
 Task user_cold_state, NDCG1:  0.8716, nDCG3:  0.8765 NDCG5:  0.8890, nDCG10:  0.9556
@@ -37,10 +50,6 @@ Task user_cold_state, NDCG1:  0.7814, nDCG3:  0.8017 NDCG5:  0.8305, nDCG10:  0.
 Task item_cold_state, NDCG1:  0.7177, nDCG3:  0.7480 NDCG5:  0.7885, nDCG10:  0.9088
 Task user_and_item_cold_state, NDCG1:  0.7029, nDCG3:  0.7524 NDCG5:  0.7915, nDCG10:  0.9095
 
-MeGCN 平行增加 32 user and item embedding.
-Task warm_state, NDCG1:  0.8877, nDCG3:  0.8905 NDCG5:  0.9043, nDCG10:  0.9611
-Task user_cold_state, NDCG1:  0.8787, nDCG3:  0.8826 NDCG5:  0.8937, nDCG10:  0.9576
-Task item_cold_state, NDCG1:  0.7593, nDCG3:  0.7805 NDCG5:  0.8104, nDCG10:  0.9198
-Task user_and_item_cold_state, NDCG1:  0.7626, nDCG3:  0.7790 NDCG5:  0.8086, nDCG10:  0.9193
+
 
 

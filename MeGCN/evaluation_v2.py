@@ -10,7 +10,7 @@ from options import config, states
 
 # torch.autograd.set_detect_anomaly(True)
 
-def evaluation_(megcn, master_path, log_name):
+def evaluation_(megcn, master_path, log_name, update=False):
     # if not os.path.exists("{}/scores/".format(master_path)):
     #     os.mkdir("{}/scores/".format(master_path))
     if config['use_cuda']:
@@ -46,7 +46,11 @@ def evaluation_(megcn, master_path, log_name):
             #         item_id = line.strip().split()[1]
             #         item_ids.append(item_id)
 
-            query_y_pred = megcn.inference(support_ys, support_features, support_pair_id, query_features, query_pair_id, config['inner']) #config['inner']
+            if update:
+                query_y_pred = megcn.inference(support_ys, support_features, support_pair_id, query_features, query_pair_id, config['inner']) #config['inner']
+            else:
+                query_y_pred = megcn.forward(support_ys, support_features, support_pair_id, query_features, query_pair_id, config['inner']) #config['inner']
+
             query_y_pred = query_y_pred.view(1, -1).cpu().detach().numpy()
             ndcg1 = ndcg_score(query_ys.view(1, -1).numpy(), query_y_pred, k=1)
             ndcg1_list.append(ndcg1)
@@ -81,11 +85,11 @@ if __name__ == "__main__":
     ml_dataset = GCNDataLoader(master_path)
     ml_dataset.getSparseGraph(cache=False)
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/MetaGCN_v2.pkl".format(master_path)
+    model_filename = "{}/MetaGCN_v2_zero.pkl".format(master_path)
     if not os.path.exists(model_filename):
         raise Exception(f'Model not exist in {master_path}')
     else:
         megcn = torch.load(model_filename)
         # melu.load_state_dict(trained_state_dict)
 
-    evaluation_(megcn, master_path, 'megcn_v2_new_inference')
+    evaluation_(megcn, master_path, 'megcn_v2_zero')
