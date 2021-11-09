@@ -57,22 +57,6 @@ class GCNDataLoader():
         self.mode_dict = {'train': 0, "test": 1}
         self.mode = self.mode_dict['train']
 
-        # train_file = path + '/train.txt'
-        # test_file = path + '/test.txt'
-        # self.path = path
-        # trainUniqueUsers, trainItem, trainUser = [], [], []
-        # testUniqueUsers, testItem, testUser = [], [], []
-        warm_uids = []
-        warm_iids = []
-
-        all_uids = []
-
-        all_iids = []
-        # all_item_info_ids = []
-        # all_user_info_ids = []
-
-
-        self.state_idx2ids = {state : [] for state in states}
 
         all_info = pickle.load(open("{}/all_info.pkl".format(master_path), "rb"))
         max_uid, max_mid, warm_uids, warm_iids, state_size = all_info
@@ -82,39 +66,58 @@ class GCNDataLoader():
         self.warm_item_ids = warm_iids
         self.state_size = state_size
 
+        self.num_user_feature = config['user_feature_num']
+        self.num_item_feature = config['item_feature_num']
+
         self.item_dict = pickle.load(open("{}/m_movie_dict.pkl".format(master_path), "rb"))
         self.user_dict = pickle.load(open("{}/m_user_dict.pkl".format(master_path), "rb"))
 
         self.Graph = None
         print(f"{len(warm_iids)} interactions for training")
 
+        # user - feature of user
         u_uf_net = np.zeros((self.n_user, config['user_feature_num']))
         for u_id in self.user_dict:
             u_fearue = self.user_dict[u_id]
             u_uf_net[u_id, :] = u_fearue.reshape(-1)
+        self.u_uf_net = csr_matrix(u_uf_net)
 
-        u_uf_net = csr_matrix(u_uf_net)
+        # item - feature of items
+        i_if_net = np.zeros((self.m_item, config['item_feature_num']))
+        for i_id in self.item_dict:
+            i_fearue = self.item_dict[i_id]
+            i_if_net[i_id, :] = i_fearue.reshape(-1)
 
-        print(u_uf_net)
-
-
-
-
+        self.i_fi_net = csr_matrix(i_if_net)
 
         # (users,items), bipartite graph
         # user-item interaction matrix R (UserNumber x ItemNumber)
-        self.UserItemNet = csr_matrix((np.ones(len(warm_iids)), (warm_uids, warm_iids)),
+        self.u_i_net = csr_matrix((np.ones(len(warm_iids)), (warm_uids, warm_iids)),
                                       shape=(self.n_user, self.m_item))
 
-        self.u_fu_net = csr_matrix((np.ones(len(warm_iids)), (warm_uids, warm_iids)),
-                                      shape=(self.n_user, self.m_item))
 
-        self.users_D = np.array(self.UserItemNet.sum(axis=1)).squeeze()
-        self.users_D[self.users_D == 0.] = 1 # smooth?
-        self.items_D = np.array(self.UserItemNet.sum(axis=0)).squeeze()
-        self.items_D[self.items_D == 0.] = 1.
-        # pre-calculate
-        self._allPos = self.getUserPosItems(list(range(self.n_user)))
+        users_items_D = np.array(self.u_i_net.sum(axis=1)).squeeze()
+        users_ufs_D = np.array(self.u_uf_net.sum(axis=1)).squeeze()
+        self.users_D = (users_items_D + users_ufs_D).astype(np.float32)
+        # self.users_D[self.users_D == 0.] = 1
+
+        items_users_D = np.array(self.u_i_net.sum(axis=0)).squeeze()
+        items_ifs_D = np.array(self.i_fi_net.sum(axis=1)).squeeze()
+        self.items_D = (items_users_D + items_ifs_D).astype(np.float32)
+        # self.items_D[self.items_D == .0] = 1.
+
+        self.ufs_D = np.array(self.u_uf_net.sum(axis=0)).squeeze().astype(np.float32)
+        # self.ufs_D[self.ufs_D == 0.] = 1.
+
+        self.ifs_D = np.array(self.i_fi_net.sum(axis=0)).squeeze().astype(np.float32)
+        # self.ifs_D[self.ifs_D == 0.] = 1.
+
+
+        # self.users_D = np.array(self.UserItemNet.sum(axis=1)).squeeze()
+        # self.users_D[self.users_D == 0.] = 1
+        # self.items_D = np.array(self.UserItemNet.sum(axis=0)).squeeze()
+        # self.items_D[self.items_D == 0.] = 1.
+
         print(f"dataset is ready to go")
 
 
@@ -205,7 +208,7 @@ class GCNDataLoader():
 
 
 
-    def getSparseGraph(self, cache=True):
+    def getSparseGraph_old(self, cache=True):
         print("loading adjacency matrix")
         graph_save_path = os.path.join(self.path, 's_pre_adj_mat.npz')
         if self.Graph is None:
@@ -240,8 +243,6 @@ class GCNDataLoader():
                 print(f"costing {end -s}s, saved norm_mat...")
                 sp.save_npz(graph_save_path, norm_adj)
 
-            self.norm_adj = norm_adj
-
             if self.split == True:
                 self.Graph = self._split_A_hat(norm_adj)
                 print("done split matrix")
@@ -251,41 +252,75 @@ class GCNDataLoader():
                 print("don't split the matrix")
         return self.Graph
 
-    # def __build_test(self):
-    #     """
-    #     return:
-    #         dict: {user: [items]}
-    #     """
-    #     test_data = {}
-    #     for i, item in enumerate(self.testItem):
-    #         user = self.testUser[i]
-    #         if test_data.get(user):
-    #             test_data[user].append(item)
-    #         else:
-    #             test_data[user] = [item]
-    #     return test_data
 
-    # def getUserItemFeedback(self, users, items):
-    #     """
-    #     users:
-    #         shape [-1]
-    #     items:
-    #         shape [-1]
-    #     return:
-    #         feedback [-1]
-    #     """
-    #     # print(self.UserItemNet[users, items])
-    #     return np.array(self.UserItemNet[users, items]).astype('uint8').reshape((-1,))
 
-    def getUserPosItems(self, users):
-        # posItems[uid] = [item id that connect to uid]
-        posItems = []
-        for user in users:
-            posItems.append(self.UserItemNet[user].nonzero()[1])
-        return posItems
+    def getSparseGraph(self, cache=True):
+        print("loading adjacency matrix")
+        graph_save_path = os.path.join(self.path, 's_pre_adj_mat.npz')
+        if self.Graph is None:
+            try:
+                if not cache:
+                    raise Exception()
+                pre_adj_mat = sp.load_npz(graph_save_path)
+                print("successfully loaded...")
+                norm_adj = pre_adj_mat
+            except :
+                print("generating adjacency matrix")
+                s = time()
+                L = self.n_users + self.m_items + self.num_user_feature + self.num_item_feature
+                adj_mat = sp.dok_matrix((L, L), dtype=np.float32)
+                adj_mat = adj_mat.tolil()
 
-    # def getUserNegItems(self, users):
-    #     negItems = []
-    #     for user in users:
-    #         negItems.append(self.allNeg[user])
-    #     return negItems
+                # User - Item Graph
+                A_u_i = self.u_i_net.tolil()
+                adj_mat[:self.n_users, self.n_users: self.n_users + self.m_items] = A_u_i
+                adj_mat[self.n_users: self.n_users + self.m_items, :self.n_users] = A_u_i.T
+
+                # User - Feature of User Graph
+                A_u_fu = self.u_uf_net.tolil()
+                adj_mat[:self.n_users,
+                (self.n_users + self.m_items):
+                (self.n_users + self.m_items + self.num_user_feature)] = A_u_fu
+                adj_mat[(self.n_users + self.m_items): (self.n_users + self.m_items + self.num_user_feature),
+                :self.n_users] = A_u_fu.T
+
+                # Item - Feature of Item  Graph
+                A_i_fi = self.i_fi_net.tolil()
+                idx_1 = self.n_users
+                idx_2 = self.n_users + self.m_items
+                idx_3 = self.n_users + self.m_items + self.num_user_feature
+                adj_mat[idx_1: idx_2, idx_3:] = A_i_fi
+                adj_mat[idx_3:, idx_1: idx_2] = A_i_fi.T
+
+                adj_mat = adj_mat.todok()
+                # matrix A
+
+                rowsum = np.concatenate([self.users_D, self.items_D, self.ufs_D, self.ifs_D], axis=0)
+                # rowsum = np.array(adj_mat.sum(axis=1))
+
+                # diff = rowsum_test - rowsum.flatten()
+                # print(np.max(diff))
+
+                d_inv = np.power(rowsum, -0.5)
+                # assert d_inv == np.power(rowsum_test, -0.5)
+                d_inv[np.isinf(d_inv)] = 0.
+
+                d_mat = sp.diags(d_inv)
+                # Matrix D^(-1/2)
+
+                norm_adj = d_mat.dot(adj_mat)
+                norm_adj = norm_adj.dot(d_mat)
+                norm_adj = norm_adj.tocsr()
+
+                end = time()
+                print(f"costing {end -s}s, saved norm_mat...")
+                sp.save_npz(graph_save_path, norm_adj)
+
+            # if self.split == True:
+            #     self.Graph = self._split_A_hat(norm_adj)
+            #     print("done split matrix")
+            # else:
+            self.Graph = self._convert_sp_mat_to_sp_tensor(norm_adj)
+            self.Graph = self.Graph.coalesce().cuda()
+            print("don't split the matrix")
+        return self.Graph
