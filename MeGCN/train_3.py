@@ -1,4 +1,6 @@
 import os
+import sys
+
 import torch
 import pickle
 
@@ -34,11 +36,11 @@ config = {
     # cuda setting
     'use_cuda': True,
     # model setting
-    'inner': 15, # update time
-    'lr': 5e-5,
-    'local_lr': 1e-6,
+    'inner': 20, # update time
+    'lr': 1e-4,
+    'local_lr': 5e-6,
     'batch_size': 32,
-    'num_epoch': 40,
+    'num_epoch': 100,
     # candidate selection
     # 'num_candidate': 20,
     'gcn_layer_number' : 5
@@ -52,12 +54,14 @@ def training(model_, total_dataset, batch_size, num_epoch, model_save=True, mode
 
     training_set_size = len(total_dataset)
     model_.train()
-    for _ in range(num_epoch):
-        print('Epoch ', _)
+    for epoch in range(num_epoch):
         random.shuffle(total_dataset)
         num_batch = int(training_set_size / batch_size)
         a,b,c,d = zip(*total_dataset)
-        for i in tqdm(range(num_batch)):
+
+        losses = []
+
+        for i in range(num_batch):
             try:
                 s_pair_batch = list(a[batch_size*i:batch_size*(i+1)])
                 s_y_batch = list(b[batch_size*i:batch_size*(i+1)])
@@ -70,10 +74,15 @@ def training(model_, total_dataset, batch_size, num_epoch, model_save=True, mode
             batch_data = (s_pair_batch, s_y_batch,
                           q_pair_batch, q_y_batch)
 
-            model_.global_update(batch_data, config['inner'])
+            batch_loss = model_.global_update(batch_data, config['inner'])
+            losses.append(batch_loss)
 
-    if model_save:
-        torch.save(model_, model_filename)
+        print(f'Epoch {epoch} Loss: {torch.stack(losses).mean(0)}')
+        sys.stdout.flush()
+
+        if model_save:
+            # print('Save')
+            torch.save(model_, model_filename)
 
 if __name__ == "__main__":
     master_path= "/home/workspace/big_data/KDD_projects_data/ml1m_final"
@@ -86,7 +95,12 @@ if __name__ == "__main__":
     ml_dataset.getSparseGraph()
 
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/MetaGCN_v3_gcn5_i15o40.pkl".format(master_path)
+    model_filename = "{}/MetaGCN5_v3_largeinner_wdecay.pkl".format(master_path)
+
+    print('============ Config ===============')
+    for k in config:
+        print(k, ':', config[k])
+
 
     # Load training dataset.
     training_set_size = ml_dataset.state_size['warm_state']
@@ -118,5 +132,5 @@ if __name__ == "__main__":
     training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
     # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
 
-    evaluation_(megcn, master_path, 'megcn5_in15out40_v3')
+    evaluation_(megcn, master_path, 'megcn5_v3_largeinner_wdecay')
     # evaluation_(megcn, master_path, 'megcn_v3_infer')

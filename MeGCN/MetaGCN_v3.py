@@ -53,6 +53,7 @@ class GCN_Estimator(torch.nn.Module):
         )
 
 
+
         # with torch.no_grad():
         #     warm_uids = set(self.gcn_dataset.warm_user_ids)
         #
@@ -73,6 +74,13 @@ class GCN_Estimator(torch.nn.Module):
 
         self.gcn_layer_number = config['gcn_layer_number']
 
+        self.layer_weight = torch.nn.Linear(
+                in_features=self.embedding_dim,
+                out_features=self.embedding_dim,
+                bias=False
+            )
+
+
 
 
 
@@ -87,6 +95,7 @@ class GCN_Estimator(torch.nn.Module):
         g = A_hat
 
         for layer in range(self.gcn_layer_number):
+            all_emb = self.layer_weight(all_emb)
             all_emb = torch.sparse.mm(g, all_emb)
             embs.append(all_emb)
         embs = torch.stack(embs, dim=1)
@@ -108,7 +117,7 @@ class GCN_Estimator(torch.nn.Module):
         #         self.embedding_all_item[iid] = torch.nn.Parameter(torch.ones(self.embedding_dim).cuda())
 
     def get_init_emb(self, user_ids, item_ids):
-        return self.user_gcn_emb(user_ids), self.item_gcn_emb(item_ids)
+        return self.user_emb(user_ids), self.item_emb(item_ids)
 
 
 
@@ -159,7 +168,7 @@ class MetaGCN(torch.nn.Module):
         # self.local_update_target_weight_name = ['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias',
         #                                         'linear_out.weight', 'linear_out.bias']
 
-        self.local_update_target_weight_name = list(self.model.state_dict().keys())
+        self.local_update_target_weight_name = ['layer_weight.weight']
 
         self.A_hat_train = gcn_dataset.getSparseGraph() # cache=False
         self.gcn_dataset = gcn_dataset
@@ -267,14 +276,14 @@ class MetaGCN(torch.nn.Module):
                                             q_pair_batch[i], num_local_update)
             # TODO: get weight decay
 
-            loss_q = F.mse_loss(query_set_y_pred, q_y_batch[i]) # .view(-1, 1) + self.get_weights_decay_loss(q_pair_batch[i])
+            loss_q = F.mse_loss(query_set_y_pred, q_y_batch[i]) + self.get_weights_decay_loss(q_pair_batch[i])
             losses_q.append(loss_q)
         losses_q = torch.stack(losses_q).mean(0)
         self.meta_optim.zero_grad()
         losses_q.backward()
         self.meta_optim.step()
         self.store_parameters()
-        return
+        return losses_q
 
     # def get_weight_avg_norm(self, support_set_x, support_set_y, num_local_update):
     #     tmp = 0.

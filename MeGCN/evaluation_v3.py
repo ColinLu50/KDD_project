@@ -1,4 +1,5 @@
 import os
+import sys
 import torch
 import pickle
 from sklearn.metrics import ndcg_score
@@ -67,6 +68,8 @@ def evaluation_(megcn, master_path, log_name, update=False):
         print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
         result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
+    print(result_str)
+    sys.stdout.flush()
 
     file_path = os.path.join(master_path, 'out', log_name)
     if not os.path.exists(os.path.dirname(file_path)):
