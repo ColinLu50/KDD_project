@@ -1,14 +1,14 @@
 import os
+import sys
 import torch
 import pickle
 
-from MeLU_reptile import MeLU
+from MeAtt import MeAtt
 # from options import config
-# from model_training import training
 from data_generation import generate
-from evaluation_melu import evaluation_
+from evaluation_meatt import evaluation_
 import random
-random.seed(1111)
+random.seed(1)
 
 config = {
     # item
@@ -27,9 +27,9 @@ config = {
     # cuda setting
     'use_cuda': True,
     # model setting
-    'inner': 10,
+    'inner': 1,
     'lr': 5e-5,
-    'local_lr': 1e-6,
+    'local_lr': 5e-6,
     'batch_size': 32,
     'num_epoch': 20,
     # candidate selection
@@ -37,23 +37,21 @@ config = {
 }
 
 
-def training_reptile(melu, total_dataset, batch_size, num_epoch, model_save=True, model_filename=None):
+def training(model_, total_dataset, batch_size, num_epoch, model_save=True, model_filename=None):
     if config['use_cuda']:
-        melu.cuda()
+        model_.cuda()
+
+    best_ever = -1
 
     training_set_size = len(total_dataset)
-    num_batch = int(training_set_size / batch_size)
-
-    total_iteration = num_epoch * num_batch
-
-    melu.train()
-    for e_num in range(num_epoch):
+    model_.train()
+    for epoch in range(num_epoch):
         random.shuffle(total_dataset)
+        epoch_loss = []
 
-
+        num_batch = int(training_set_size / batch_size)
         a,b,c,d = zip(*total_dataset)
         for i in range(num_batch):
-            cur_iteration = e_num * num_batch + i
             try:
                 supp_xs = list(a[batch_size*i:batch_size*(i+1)])
                 supp_ys = list(b[batch_size*i:batch_size*(i+1)])
@@ -61,10 +59,23 @@ def training_reptile(melu, total_dataset, batch_size, num_epoch, model_save=True
                 query_ys = list(d[batch_size*i:batch_size*(i+1)])
             except IndexError:
                 continue
-            melu.global_update(supp_xs, supp_ys, query_xs, query_ys, config['inner'], 1)
+            batch_loss = model_.global_update(supp_xs, supp_ys, query_xs, query_ys, config['inner'])
+            epoch_loss.append(batch_loss)
 
-    if model_save:
-        torch.save(melu, model_filename)
+        print(f'Epoch {epoch} Loss: {torch.stack(epoch_loss).mean(0)}')
+        sys.stdout.flush()
+
+        if model_save:
+            cur_v = evaluation_(model_, master_path, 'tmp', test_state="user_and_item_cold_state")
+            if cur_v > best_ever:
+                best_ever = cur_v
+                # print('Save')
+                print('Better value:', best_ever, 'Save!')
+                torch.save(model_, model_filename)
+
+print('===============================')
+for k in config:
+    print(k, ':', config[k])
 
 if __name__ == "__main__":
     master_path= "/home/workspace/big_data/KDD_projects_data/ml1m"
@@ -74,8 +85,8 @@ if __name__ == "__main__":
         generate(master_path)
 
     # training model.
-    melu = MeLU(config)
-    model_filename = "{}/MeLU5_test_reptile.pkl".format(master_path)
+    melu = MeAtt(config)
+    model_filename = "{}/MeAtt1_1.pkl".format(master_path)
 
 
     # Load training dataset.
@@ -95,6 +106,11 @@ if __name__ == "__main__":
         zip(supp_xs_s, supp_ys_s, query_xs_s, query_ys_s))
     del (supp_xs_s, supp_ys_s, query_xs_s, query_ys_s)
 
-    training_reptile(melu, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
+    training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
     # training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
-    evaluation_(melu, master_path, 'melu5_reptile_test1')
+
+    torch.save(melu, model_filename + '_final')
+
+    # test_model = torch.load(model_filename)
+
+    evaluation_(melu, master_path, 'MeAtt1_v1')

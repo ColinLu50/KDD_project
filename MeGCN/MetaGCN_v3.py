@@ -74,11 +74,20 @@ class GCN_Estimator(torch.nn.Module):
 
         self.gcn_layer_number = config['gcn_layer_number']
 
-        self.layer_weight = torch.nn.Linear(
-                in_features=self.embedding_dim,
-                out_features=self.embedding_dim,
-                bias=False
-            )
+        # self.layer_weight = torch.nn.Linear(
+        #         in_features=self.embedding_dim,
+        #         out_features=self.embedding_dim,
+        #         bias=False
+        #     )
+
+        # self.layer_weight = torch.nn.Linear(
+        #     in_features=self.embedding_dim,
+        #     out_features=self.embedding_dim,
+        #     bias=False
+        # )
+        N = self.num_users + self.num_items + self.num_user_features + self.num_item_features
+        self.layer_weight = torch.nn.Parameter(data=torch.Tensor(N, 32), requires_grad=True)
+        self.layer_weight.data.normal_(std=0.5)
 
 
 
@@ -95,9 +104,10 @@ class GCN_Estimator(torch.nn.Module):
         g = A_hat
 
         for layer in range(self.gcn_layer_number):
-            all_emb = self.layer_weight(all_emb)
+            all_emb = torch.mul(self.layer_weight, all_emb)
             all_emb = torch.sparse.mm(g, all_emb)
             embs.append(all_emb)
+
         embs = torch.stack(embs, dim=1)
         # print(embs.size())
         light_out = torch.mean(embs, dim=1)
@@ -141,6 +151,9 @@ class GCN_Estimator(torch.nn.Module):
 
         user_gcn_emb = all_users_gcn_emb[user_ids]
         item_gcn_emb = all_items_gcn_emb[item_ids]
+
+        # user_gcn_emb = self.layer_weight(user_gcn_emb)
+        # item_gcn_emb = self.layer_weight(item_gcn_emb)
 
         inner_product = torch.mul(user_gcn_emb, item_gcn_emb)
 

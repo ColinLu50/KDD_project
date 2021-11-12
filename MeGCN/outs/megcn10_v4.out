@@ -1,0 +1,333 @@
+loading from [movielens/ml-1m]
+95281 interactions for training
+dataset is ready to go
+loading adjacency matrix
+successfully loaded...
+don't split the matrix
+loading adjacency matrix
+============ Config ===============
+num_rate : 6
+num_genre : 25
+num_director : 2186
+num_actor : 8030
+embedding_dim : 32
+first_fc_hidden_dim : 64
+second_fc_hidden_dim : 64
+num_gender : 2
+num_age : 7
+num_occupation : 21
+num_zipcode : 3402
+use_cuda : True
+inner : 3
+lr : 0.005
+local_lr : 5e-06
+batch_size : 32
+num_epoch : 100
+gcn_layer_number : 10
+Epoch 0 Loss: 45.308021545410156
+
+Task user_and_item_cold_state, NDCG1:  0.7375, nDCG3:  0.7650 NDCG5:  0.7983, nDCG10:  0.9138
+Better value: 0.7374596588289534 Save!
+Epoch 1 Loss: 40.67941665649414
+
+Task user_and_item_cold_state, NDCG1:  0.7461, nDCG3:  0.7692 NDCG5:  0.8031, nDCG10:  0.9156
+Better value: 0.746104195481789 Save!
+Epoch 2 Loss: 30.799951553344727
+
+Task user_and_item_cold_state, NDCG1:  0.7332, nDCG3:  0.7756 NDCG5:  0.8102, nDCG10:  0.9170
+Epoch 3 Loss: 20.59370994567871
+
+Task user_and_item_cold_state, NDCG1:  0.7342, nDCG3:  0.7713 NDCG5:  0.8027, nDCG10:  0.9152
+Epoch 4 Loss: 17.97443389892578
+
+Task user_and_item_cold_state, NDCG1:  0.7322, nDCG3:  0.7603 NDCG5:  0.7955, nDCG10:  0.9122
+Epoch 5 Loss: 16.049816131591797
+
+Task user_and_item_cold_state, NDCG1:  0.7367, nDCG3:  0.7593 NDCG5:  0.7949, nDCG10:  0.9123
+Epoch 6 Loss: 14.528769493103027
+
+Task user_and_item_cold_state, NDCG1:  0.7435, nDCG3:  0.7627 NDCG5:  0.7960, nDCG10:  0.9133
+Epoch 7 Loss: 13.205842971801758
+
+Task user_and_item_cold_state, NDCG1:  0.7406, nDCG3:  0.7622 NDCG5:  0.7959, nDCG10:  0.9131
+Epoch 8 Loss: 12.10826587677002
+
+Task user_and_item_cold_state, NDCG1:  0.7424, nDCG3:  0.7643 NDCG5:  0.7966, nDCG10:  0.9136
+Epoch 9 Loss: 11.12537956237793
+
+Task user_and_item_cold_state, NDCG1:  0.7388, nDCG3:  0.7631 NDCG5:  0.7961, nDCG10:  0.9132
+Epoch 10 Loss: 10.269782066345215
+
+Task user_and_item_cold_state, NDCG1:  0.7371, nDCG3:  0.7613 NDCG5:  0.7955, nDCG10:  0.9128
+Epoch 11 Loss: 9.48544692993164
+
+Task user_and_item_cold_state, NDCG1:  0.7360, nDCG3:  0.7606 NDCG5:  0.7951, nDCG10:  0.9125
+Epoch 12 Loss: 8.801968574523926
+
+Task user_and_item_cold_state, NDCG1:  0.7360, nDCG3:  0.7585 NDCG5:  0.7946, nDCG10:  0.9121
+Epoch 13 Loss: 8.160750389099121
+
+Task user_and_item_cold_state, NDCG1:  0.7349, nDCG3:  0.7596 NDCG5:  0.7950, nDCG10:  0.9121
+Epoch 14 Loss: 7.567626476287842
+
+Task user_and_item_cold_state, NDCG1:  0.7311, nDCG3:  0.7621 NDCG5:  0.7946, nDCG10:  0.9123
+Epoch 15 Loss: 7.040665626525879
+
+Task user_and_item_cold_state, NDCG1:  0.7357, nDCG3:  0.7619 NDCG5:  0.7942, nDCG10:  0.9125
+Epoch 16 Loss: 6.538954257965088
+
+Task user_and_item_cold_state, NDCG1:  0.7367, nDCG3:  0.7642 NDCG5:  0.7947, nDCG10:  0.9131
+Epoch 17 Loss: 6.082027435302734
+
+Task user_and_item_cold_state, NDCG1:  0.7328, nDCG3:  0.7626 NDCG5:  0.7946, nDCG10:  0.9126
+Epoch 18 Loss: 5.661123752593994
+
+Task user_and_item_cold_state, NDCG1:  0.7325, nDCG3:  0.7625 NDCG5:  0.7938, nDCG10:  0.9125
+Epoch 19 Loss: 5.268856525421143
+
+Task user_and_item_cold_state, NDCG1:  0.7280, nDCG3:  0.7610 NDCG5:  0.7933, nDCG10:  0.9118
+Epoch 20 Loss: 4.897977828979492
+
+Task user_and_item_cold_state, NDCG1:  0.7342, nDCG3:  0.7607 NDCG5:  0.7939, nDCG10:  0.9122
+Epoch 21 Loss: 4.553868770599365
+
+Task user_and_item_cold_state, NDCG1:  0.7381, nDCG3:  0.7631 NDCG5:  0.7949, nDCG10:  0.9129
+Epoch 22 Loss: 4.23110294342041
+
+Task user_and_item_cold_state, NDCG1:  0.7360, nDCG3:  0.7625 NDCG5:  0.7949, nDCG10:  0.9127
+Epoch 23 Loss: 3.930083990097046
+
+Task user_and_item_cold_state, NDCG1:  0.7357, nDCG3:  0.7634 NDCG5:  0.7948, nDCG10:  0.9127
+Epoch 24 Loss: 3.6628432273864746
+
+Task user_and_item_cold_state, NDCG1:  0.7358, nDCG3:  0.7646 NDCG5:  0.7945, nDCG10:  0.9129
+Epoch 25 Loss: 3.402904748916626
+
+Task user_and_item_cold_state, NDCG1:  0.7372, nDCG3:  0.7650 NDCG5:  0.7941, nDCG10:  0.9128
+Epoch 26 Loss: 3.161987543106079
+
+Task user_and_item_cold_state, NDCG1:  0.7335, nDCG3:  0.7626 NDCG5:  0.7949, nDCG10:  0.9126
+Epoch 27 Loss: 2.93123459815979
+
+Task user_and_item_cold_state, NDCG1:  0.7339, nDCG3:  0.7622 NDCG5:  0.7935, nDCG10:  0.9125
+Epoch 28 Loss: 2.7242720127105713
+
+Task user_and_item_cold_state, NDCG1:  0.7322, nDCG3:  0.7613 NDCG5:  0.7937, nDCG10:  0.9123
+Epoch 29 Loss: 2.52962327003479
+
+Task user_and_item_cold_state, NDCG1:  0.7333, nDCG3:  0.7608 NDCG5:  0.7935, nDCG10:  0.9122
+Epoch 30 Loss: 2.3461945056915283
+
+Task user_and_item_cold_state, NDCG1:  0.7311, nDCG3:  0.7600 NDCG5:  0.7924, nDCG10:  0.9118
+Epoch 31 Loss: 2.1822524070739746
+
+Task user_and_item_cold_state, NDCG1:  0.7339, nDCG3:  0.7614 NDCG5:  0.7923, nDCG10:  0.9122
+Epoch 32 Loss: 2.02207612991333
+
+Task user_and_item_cold_state, NDCG1:  0.7346, nDCG3:  0.7623 NDCG5:  0.7929, nDCG10:  0.9123
+Epoch 33 Loss: 1.8753533363342285
+
+Task user_and_item_cold_state, NDCG1:  0.7350, nDCG3:  0.7627 NDCG5:  0.7935, nDCG10:  0.9126
+Epoch 34 Loss: 1.7326312065124512
+
+Task user_and_item_cold_state, NDCG1:  0.7314, nDCG3:  0.7616 NDCG5:  0.7926, nDCG10:  0.9121
+Epoch 35 Loss: 1.6020187139511108
+
+Task user_and_item_cold_state, NDCG1:  0.7361, nDCG3:  0.7627 NDCG5:  0.7930, nDCG10:  0.9126
+Epoch 36 Loss: 1.4839202165603638
+
+Task user_and_item_cold_state, NDCG1:  0.7326, nDCG3:  0.7611 NDCG5:  0.7931, nDCG10:  0.9121
+Epoch 37 Loss: 1.3709309101104736
+
+Task user_and_item_cold_state, NDCG1:  0.7332, nDCG3:  0.7621 NDCG5:  0.7929, nDCG10:  0.9121
+Epoch 38 Loss: 1.26979660987854
+
+Task user_and_item_cold_state, NDCG1:  0.7333, nDCG3:  0.7636 NDCG5:  0.7931, nDCG10:  0.9122
+Epoch 39 Loss: 1.1771782636642456
+
+Task user_and_item_cold_state, NDCG1:  0.7383, nDCG3:  0.7645 NDCG5:  0.7937, nDCG10:  0.9127
+Epoch 40 Loss: 1.0879050493240356
+
+Task user_and_item_cold_state, NDCG1:  0.7349, nDCG3:  0.7638 NDCG5:  0.7938, nDCG10:  0.9124
+Epoch 41 Loss: 1.0077252388000488
+
+Task user_and_item_cold_state, NDCG1:  0.7386, nDCG3:  0.7648 NDCG5:  0.7938, nDCG10:  0.9128
+Epoch 42 Loss: 0.9272875785827637
+
+Task user_and_item_cold_state, NDCG1:  0.7390, nDCG3:  0.7662 NDCG5:  0.7956, nDCG10:  0.9132
+Epoch 43 Loss: 0.8576914072036743
+
+Task user_and_item_cold_state, NDCG1:  0.7406, nDCG3:  0.7657 NDCG5:  0.7956, nDCG10:  0.9133
+Epoch 44 Loss: 0.7889550924301147
+
+Task user_and_item_cold_state, NDCG1:  0.7382, nDCG3:  0.7655 NDCG5:  0.7949, nDCG10:  0.9130
+Epoch 45 Loss: 0.7275887131690979
+
+Task user_and_item_cold_state, NDCG1:  0.7400, nDCG3:  0.7666 NDCG5:  0.7962, nDCG10:  0.9134
+Epoch 46 Loss: 0.670549213886261
+
+Task user_and_item_cold_state, NDCG1:  0.7420, nDCG3:  0.7665 NDCG5:  0.7960, nDCG10:  0.9136
+Epoch 47 Loss: 0.6175376176834106
+
+Task user_and_item_cold_state, NDCG1:  0.7383, nDCG3:  0.7656 NDCG5:  0.7952, nDCG10:  0.9131
+Epoch 48 Loss: 0.5688284635543823
+
+Task user_and_item_cold_state, NDCG1:  0.7407, nDCG3:  0.7655 NDCG5:  0.7964, nDCG10:  0.9134
+Epoch 49 Loss: 0.5220639705657959
+
+Task user_and_item_cold_state, NDCG1:  0.7391, nDCG3:  0.7662 NDCG5:  0.7958, nDCG10:  0.9130
+Epoch 50 Loss: 0.4798777401447296
+
+Task user_and_item_cold_state, NDCG1:  0.7407, nDCG3:  0.7657 NDCG5:  0.7958, nDCG10:  0.9133
+Epoch 51 Loss: 0.44203636050224304
+
+Task user_and_item_cold_state, NDCG1:  0.7414, nDCG3:  0.7656 NDCG5:  0.7959, nDCG10:  0.9132
+Epoch 52 Loss: 0.4039141833782196
+
+Task user_and_item_cold_state, NDCG1:  0.7421, nDCG3:  0.7655 NDCG5:  0.7959, nDCG10:  0.9134
+Epoch 53 Loss: 0.3714974522590637
+
+Task user_and_item_cold_state, NDCG1:  0.7365, nDCG3:  0.7653 NDCG5:  0.7962, nDCG10:  0.9130
+Epoch 54 Loss: 0.34397250413894653
+
+Task user_and_item_cold_state, NDCG1:  0.7407, nDCG3:  0.7666 NDCG5:  0.7968, nDCG10:  0.9137
+Epoch 55 Loss: 0.31691116094589233
+
+Task user_and_item_cold_state, NDCG1:  0.7369, nDCG3:  0.7651 NDCG5:  0.7958, nDCG10:  0.9131
+Epoch 56 Loss: 0.2905276417732239
+
+Task user_and_item_cold_state, NDCG1:  0.7396, nDCG3:  0.7650 NDCG5:  0.7959, nDCG10:  0.9131
+Epoch 57 Loss: 0.26932698488235474
+
+Task user_and_item_cold_state, NDCG1:  0.7383, nDCG3:  0.7647 NDCG5:  0.7958, nDCG10:  0.9132
+Epoch 58 Loss: 0.24715250730514526
+
+Task user_and_item_cold_state, NDCG1:  0.7370, nDCG3:  0.7654 NDCG5:  0.7961, nDCG10:  0.9131
+Epoch 59 Loss: 0.22656375169754028
+
+Task user_and_item_cold_state, NDCG1:  0.7353, nDCG3:  0.7648 NDCG5:  0.7958, nDCG10:  0.9130
+Epoch 60 Loss: 0.20690466463565826
+
+Task user_and_item_cold_state, NDCG1:  0.7395, nDCG3:  0.7664 NDCG5:  0.7978, nDCG10:  0.9136
+Epoch 61 Loss: 0.18998341262340546
+
+Task user_and_item_cold_state, NDCG1:  0.7365, nDCG3:  0.7652 NDCG5:  0.7963, nDCG10:  0.9130
+Epoch 62 Loss: 0.17464978992938995
+
+Task user_and_item_cold_state, NDCG1:  0.7382, nDCG3:  0.7647 NDCG5:  0.7964, nDCG10:  0.9131
+Epoch 63 Loss: 0.1613193303346634
+
+Task user_and_item_cold_state, NDCG1:  0.7354, nDCG3:  0.7645 NDCG5:  0.7961, nDCG10:  0.9130
+Epoch 64 Loss: 0.14836391806602478
+
+Task user_and_item_cold_state, NDCG1:  0.7365, nDCG3:  0.7637 NDCG5:  0.7954, nDCG10:  0.9129
+Epoch 65 Loss: 0.13659758865833282
+
+Task user_and_item_cold_state, NDCG1:  0.7351, nDCG3:  0.7659 NDCG5:  0.7965, nDCG10:  0.9133
+Epoch 66 Loss: 0.12654151022434235
+
+Task user_and_item_cold_state, NDCG1:  0.7392, nDCG3:  0.7644 NDCG5:  0.7972, nDCG10:  0.9134
+Epoch 67 Loss: 0.11645472794771194
+
+Task user_and_item_cold_state, NDCG1:  0.7289, nDCG3:  0.7624 NDCG5:  0.7951, nDCG10:  0.9123
+Epoch 68 Loss: 0.1070132926106453
+
+Task user_and_item_cold_state, NDCG1:  0.7376, nDCG3:  0.7646 NDCG5:  0.7974, nDCG10:  0.9134
+Epoch 69 Loss: 0.09946148097515106
+
+Task user_and_item_cold_state, NDCG1:  0.7337, nDCG3:  0.7653 NDCG5:  0.7956, nDCG10:  0.9131
+Epoch 70 Loss: 0.09325341135263443
+
+Task user_and_item_cold_state, NDCG1:  0.7359, nDCG3:  0.7649 NDCG5:  0.7968, nDCG10:  0.9133
+Epoch 71 Loss: 0.08678439259529114
+
+Task user_and_item_cold_state, NDCG1:  0.7302, nDCG3:  0.7628 NDCG5:  0.7945, nDCG10:  0.9124
+Epoch 72 Loss: 0.08094344288110733
+
+Task user_and_item_cold_state, NDCG1:  0.7354, nDCG3:  0.7640 NDCG5:  0.7961, nDCG10:  0.9131
+Epoch 73 Loss: 0.07456251978874207
+
+Task user_and_item_cold_state, NDCG1:  0.7332, nDCG3:  0.7632 NDCG5:  0.7960, nDCG10:  0.9130
+Epoch 74 Loss: 0.06831453740596771
+
+Task user_and_item_cold_state, NDCG1:  0.7330, nDCG3:  0.7637 NDCG5:  0.7961, nDCG10:  0.9129
+Epoch 75 Loss: 0.06360819935798645
+
+Task user_and_item_cold_state, NDCG1:  0.7275, nDCG3:  0.7613 NDCG5:  0.7950, nDCG10:  0.9120
+Epoch 76 Loss: 0.05912494286894798
+
+Task user_and_item_cold_state, NDCG1:  0.7293, nDCG3:  0.7624 NDCG5:  0.7962, nDCG10:  0.9126
+Epoch 77 Loss: 0.056044355034828186
+
+Task user_and_item_cold_state, NDCG1:  0.7327, nDCG3:  0.7625 NDCG5:  0.7958, nDCG10:  0.9128
+Epoch 78 Loss: 0.054327648133039474
+
+Task user_and_item_cold_state, NDCG1:  0.7303, nDCG3:  0.7625 NDCG5:  0.7959, nDCG10:  0.9126
+Epoch 79 Loss: 0.05119764432311058
+
+Task user_and_item_cold_state, NDCG1:  0.7319, nDCG3:  0.7630 NDCG5:  0.7956, nDCG10:  0.9128
+Epoch 80 Loss: 0.04769422113895416
+
+Task user_and_item_cold_state, NDCG1:  0.7331, nDCG3:  0.7612 NDCG5:  0.7958, nDCG10:  0.9127
+Epoch 81 Loss: 0.04621705412864685
+
+Task user_and_item_cold_state, NDCG1:  0.7312, nDCG3:  0.7633 NDCG5:  0.7955, nDCG10:  0.9128
+Epoch 82 Loss: 0.04302537441253662
+
+Task user_and_item_cold_state, NDCG1:  0.7328, nDCG3:  0.7632 NDCG5:  0.7965, nDCG10:  0.9131
+Epoch 83 Loss: 0.039698414504528046
+
+Task user_and_item_cold_state, NDCG1:  0.7333, nDCG3:  0.7637 NDCG5:  0.7952, nDCG10:  0.9130
+Epoch 84 Loss: 0.03692302852869034
+
+Task user_and_item_cold_state, NDCG1:  0.7331, nDCG3:  0.7630 NDCG5:  0.7962, nDCG10:  0.9128
+Epoch 85 Loss: 0.035058047622442245
+
+Task user_and_item_cold_state, NDCG1:  0.7351, nDCG3:  0.7648 NDCG5:  0.7965, nDCG10:  0.9133
+Epoch 86 Loss: 0.03413466736674309
+
+Task user_and_item_cold_state, NDCG1:  0.7354, nDCG3:  0.7637 NDCG5:  0.7963, nDCG10:  0.9132
+Epoch 87 Loss: 0.03292100504040718
+
+Task user_and_item_cold_state, NDCG1:  0.7337, nDCG3:  0.7645 NDCG5:  0.7963, nDCG10:  0.9132
+Epoch 88 Loss: 0.03169767186045647
+
+Task user_and_item_cold_state, NDCG1:  0.7367, nDCG3:  0.7646 NDCG5:  0.7974, nDCG10:  0.9135
+Epoch 89 Loss: 0.03068999946117401
+
+Task user_and_item_cold_state, NDCG1:  0.7349, nDCG3:  0.7631 NDCG5:  0.7961, nDCG10:  0.9131
+Epoch 90 Loss: 0.029915926977992058
+
+Task user_and_item_cold_state, NDCG1:  0.7355, nDCG3:  0.7639 NDCG5:  0.7963, nDCG10:  0.9133
+Epoch 91 Loss: 0.031173890456557274
+
+Task user_and_item_cold_state, NDCG1:  0.7342, nDCG3:  0.7627 NDCG5:  0.7951, nDCG10:  0.9129
+Epoch 92 Loss: 0.03134657070040703
+
+Task user_and_item_cold_state, NDCG1:  0.7358, nDCG3:  0.7657 NDCG5:  0.7971, nDCG10:  0.9135
+Epoch 93 Loss: 0.030315540730953217
+
+Task user_and_item_cold_state, NDCG1:  0.7352, nDCG3:  0.7638 NDCG5:  0.7956, nDCG10:  0.9132
+Epoch 94 Loss: 0.02967369742691517
+
+Task user_and_item_cold_state, NDCG1:  0.7376, nDCG3:  0.7658 NDCG5:  0.7964, nDCG10:  0.9135
+Epoch 95 Loss: 0.028835738077759743
+
+Task user_and_item_cold_state, NDCG1:  0.7349, nDCG3:  0.7637 NDCG5:  0.7957, nDCG10:  0.9132
+Epoch 96 Loss: 0.028046168386936188
+
+Task user_and_item_cold_state, NDCG1:  0.7378, nDCG3:  0.7659 NDCG5:  0.7969, nDCG10:  0.9136
+Epoch 97 Loss: 0.026405472308397293
+
+Task user_and_item_cold_state, NDCG1:  0.7379, nDCG3:  0.7644 NDCG5:  0.7963, nDCG10:  0.9134
+Epoch 98 Loss: 0.025621002539992332
+
+Task user_and_item_cold_state, NDCG1:  0.7378, nDCG3:  0.7646 NDCG5:  0.7970, nDCG10:  0.9136
+Epoch 99 Loss: 0.02567427232861519
+
+Task user_and_item_cold_state, NDCG1:  0.7393, nDCG3:  0.7648 NDCG5:  0.7971, nDCG10:  0.9137
+
+Task warm_state, NDCG1:  0.9999, nDCG3:  1.0000 NDCG5:  1.0000, nDCG10:  1.0000
+Task user_cold_state, NDCG1:  0.8077, nDCG3:  0.8270 NDCG5:  0.8532, nDCG10:  0.9390
+Task item_cold_state, NDCG1:  0.7311, nDCG3:  0.7654 NDCG5:  0.7993, nDCG10:  0.9133
+Task user_and_item_cold_state, NDCG1:  0.7393, nDCG3:  0.7648 NDCG5:  0.7971, nDCG10:  0.9137

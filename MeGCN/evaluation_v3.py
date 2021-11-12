@@ -11,7 +11,7 @@ from options import config, states
 
 # torch.autograd.set_detect_anomaly(True)
 
-def evaluation_(megcn, master_path, log_name, update=False):
+def evaluation_(megcn, master_path, log_name, update=False, test_state=None):
     # if not os.path.exists("{}/scores/".format(master_path)):
     #     os.mkdir("{}/scores/".format(master_path))
     if config['use_cuda']:
@@ -25,12 +25,15 @@ def evaluation_(megcn, master_path, log_name, update=False):
 
     for target_state in states:
 
+        if test_state is not None and target_state != test_state:
+            continue
+
         ndcg1_list = []
         ndcg3_list = []
         ndcg5_list = []
         ndcg10_list = []
         dataset_size = state_size[target_state]
-        for idx in tqdm(list(range(dataset_size))):
+        for idx in tqdm(list(range(dataset_size)), disable=True):
 
             support_ys = pickle.load(open("{}/{}/supp_y_{}.pkl".format(master_path, target_state, idx), "rb")).cuda()
             # support_features = pickle.load(open("{}/{}/supp_f_{}.pkl".format(master_path, target_state, idx), "rb"))
@@ -65,18 +68,22 @@ def evaluation_(megcn, master_path, log_name, update=False):
             ndcg10_list.append(ndcg10)
 
 
-        print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
+        # print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
         result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
     print(result_str)
     sys.stdout.flush()
 
-    file_path = os.path.join(master_path, 'out', log_name)
-    if not os.path.exists(os.path.dirname(file_path)):
-        os.makedirs(os.path.dirname(file_path))
+    if test_state is not None:
+        return np.mean(ndcg1_list)
 
-    with open(file_path, 'w') as f:
-        f.write(result_str + '\n')
+    if log_name:
+        file_path = os.path.join(master_path, 'out', log_name)
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+
+        with open(file_path, 'w') as f:
+            f.write(result_str + '\n')
 
 
 if __name__ == "__main__":

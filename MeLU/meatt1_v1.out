@@ -1,0 +1,42 @@
+===============================
+num_rate : 6
+num_genre : 25
+num_director : 2186
+num_actor : 8030
+embedding_dim : 32
+first_fc_hidden_dim : 64
+second_fc_hidden_dim : 64
+num_gender : 2
+num_age : 7
+num_occupation : 21
+num_zipcode : 3402
+use_cuda : True
+inner : 1
+lr : 5e-05
+local_lr : 5e-06
+batch_size : 32
+num_epoch : 20
+num_candidate : 20
+Epoch 0 Loss: 16.144817352294922
+Task user_and_item_cold_state, NDCG1:  0.7469, nDCG3:  0.7779 NDCG5:  0.8129, nDCG10:  0.9194
+==============================
+
+Task user_and_item_cold_state, NDCG1:  0.7469, nDCG3:  0.7779 NDCG5:  0.8129, nDCG10:  0.9194
+Better value: 0.7468879668049793 Save!
+Epoch 1 Loss: 16.097118377685547
+Task user_and_item_cold_state, NDCG1:  0.7537, nDCG3:  0.7853 NDCG5:  0.8171, nDCG10:  0.9218
+==============================
+
+Task user_and_item_cold_state, NDCG1:  0.7537, nDCG3:  0.7853 NDCG5:  0.8171, nDCG10:  0.9218
+Better value: 0.7537344398340248 Save!
+Epoch 2 Loss: 16.02836036682129
+Task user_and_item_cold_state, NDCG1:  0.7713, nDCG3:  0.7913 NDCG5:  0.8204, nDCG10:  0.9241
+==============================
+
+Task user_and_item_cold_state, NDCG1:  0.7713, nDCG3:  0.7913 NDCG5:  0.8204, nDCG10:  0.9241
+Better value: 0.7713231904103273 Save!
+Epoch 3 Loss: 15.949883460998535
+Task user_and_item_cold_state, NDCG1:  0.7782, nDCG3:  0.7982 NDCG5:  0.8237, nDCG10:  0.9258
+==============================
+
+Task user_and_item_cold_state, NDCG1:  0.7782, nDCG3:  0.7982 NDCG5:  0.8237, nDCG10:  0.9258

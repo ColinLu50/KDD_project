@@ -36,14 +36,14 @@ config = {
     # cuda setting
     'use_cuda': True,
     # model setting
-    'inner': 20, # update time
-    'lr': 1e-4,
+    'inner': 3, # update time
+    'lr': 5e-4,
     'local_lr': 5e-6,
     'batch_size': 32,
     'num_epoch': 100,
     # candidate selection
     # 'num_candidate': 20,
-    'gcn_layer_number' : 5
+    'gcn_layer_number' : 10
 }
 
 
@@ -51,6 +51,8 @@ config = {
 def training(model_, total_dataset, batch_size, num_epoch, model_save=True, model_filename=None):
     if config['use_cuda']:
         model_.cuda()
+
+    best_ever = -1
 
     training_set_size = len(total_dataset)
     model_.train()
@@ -81,8 +83,12 @@ def training(model_, total_dataset, batch_size, num_epoch, model_save=True, mode
         sys.stdout.flush()
 
         if model_save:
-            # print('Save')
-            torch.save(model_, model_filename)
+            cur_v = evaluation_(megcn, master_path, 'tmp', test_state="user_and_item_cold_state")
+            if cur_v > best_ever:
+                best_ever = cur_v
+                # print('Save')
+                print('Better value:', best_ever, 'Save!')
+                torch.save(model_, model_filename)
 
 if __name__ == "__main__":
     master_path= "/home/workspace/big_data/KDD_projects_data/ml1m_final"
@@ -95,7 +101,7 @@ if __name__ == "__main__":
     ml_dataset.getSparseGraph()
 
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/MetaGCN5_v3_largeinner_wdecay.pkl".format(master_path)
+    model_filename = "{}/MetaGCN10_v4_smallinner_weightdecay.pkl".format(master_path)
 
     print('============ Config ===============')
     for k in config:
@@ -130,7 +136,7 @@ if __name__ == "__main__":
             query_pairs_list, query_ys_list)
 
     training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
-    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
+    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=2, model_save=True, model_filename=model_filename)
 
-    evaluation_(megcn, master_path, 'megcn5_v3_largeinner_wdecay')
+    evaluation_(megcn, master_path, 'megcn10_v4_smallinner_wdecay')
     # evaluation_(megcn, master_path, 'megcn_v3_infer')

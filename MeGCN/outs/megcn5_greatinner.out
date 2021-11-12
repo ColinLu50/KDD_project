@@ -1,0 +1,139 @@
+loading from [movielens/ml-1m]
+95281 interactions for training
+dataset is ready to go
+loading adjacency matrix
+successfully loaded...
+don't split the matrix
+loading adjacency matrix
+============ Config ===============
+num_rate : 6
+num_genre : 25
+num_director : 2186
+num_actor : 8030
+embedding_dim : 32
+first_fc_hidden_dim : 64
+second_fc_hidden_dim : 64
+num_gender : 2
+num_age : 7
+num_occupation : 21
+num_zipcode : 3402
+use_cuda : True
+inner : 10
+lr : 0.005
+local_lr : 5e-06
+batch_size : 32
+num_epoch : 100
+gcn_layer_number : 8
+Epoch 0 Loss: 6.795530319213867
+Epoch 1 Loss: 3.545687198638916
+Epoch 2 Loss: 3.1914494037628174
+Epoch 3 Loss: 2.806429147720337
+Epoch 4 Loss: 2.4475207328796387
+Epoch 5 Loss: 2.0895819664001465
+Epoch 6 Loss: 1.9386004209518433
+Epoch 7 Loss: 1.837448239326477
+Epoch 8 Loss: 1.5631005764007568
+Epoch 9 Loss: 1.6310923099517822
+Epoch 10 Loss: 1.5609115362167358
+Epoch 11 Loss: 1.4525744915008545
+Epoch 12 Loss: 1.5417059659957886
+Epoch 13 Loss: 1.3425954580307007
+Epoch 14 Loss: 1.3045984506607056
+Epoch 15 Loss: 1.2830064296722412
+Epoch 16 Loss: 1.1640523672103882
+Epoch 17 Loss: 1.2204965353012085
+Epoch 18 Loss: 1.3315391540527344
+Epoch 19 Loss: 1.0809475183486938
+Epoch 20 Loss: 1.0724513530731201
+Epoch 21 Loss: 1.0641627311706543
+Epoch 22 Loss: 1.0869826078414917
+Epoch 23 Loss: 1.0348787307739258
+Epoch 24 Loss: 1.033135175704956
+Epoch 25 Loss: 1.0078314542770386
+Epoch 26 Loss: 0.9946340918540955
+Epoch 27 Loss: 0.9808931946754456
+Epoch 28 Loss: 0.9399378299713135
+Epoch 29 Loss: 0.9558049440383911
+Epoch 30 Loss: 0.8774886131286621
+Epoch 31 Loss: 0.9178900122642517
+Epoch 32 Loss: 0.8695681095123291
+Epoch 33 Loss: 0.9610757231712341
+Epoch 34 Loss: 0.8547702431678772
+Epoch 35 Loss: 0.8600348830223083
+Epoch 36 Loss: 0.8224527835845947
+Epoch 37 Loss: 0.8257995843887329
+Epoch 38 Loss: 0.791927695274353
+Epoch 39 Loss: 0.7762861251831055
+Epoch 40 Loss: 0.7750289440155029
+Epoch 41 Loss: 0.7559130191802979
+Epoch 42 Loss: 0.7885944843292236
+Epoch 43 Loss: 0.7553910613059998
+Epoch 44 Loss: 0.7503212690353394
+Epoch 45 Loss: 0.7481260299682617
+Epoch 46 Loss: 0.7413116097450256
+Epoch 47 Loss: 0.7434308528900146
+Epoch 48 Loss: 0.790641188621521
+Epoch 49 Loss: 0.7491308450698853
+Epoch 50 Loss: 0.7173119187355042
+Epoch 51 Loss: 0.7217105031013489
+Epoch 52 Loss: 0.6992781162261963
+Epoch 53 Loss: 0.734858512878418
+Epoch 54 Loss: 0.6959543824195862
+Epoch 55 Loss: 0.6921619176864624
+Epoch 56 Loss: 0.6952497363090515
+Epoch 57 Loss: 0.6898528933525085
+Epoch 58 Loss: 0.7029436826705933
+Epoch 59 Loss: 0.6891341805458069
+Epoch 60 Loss: 0.7100301384925842
+Epoch 61 Loss: 0.6932644248008728
+Epoch 62 Loss: nan
+Epoch 63 Loss: nan
+Epoch 64 Loss: nan
+Epoch 65 Loss: nan
+Epoch 66 Loss: nan
+Epoch 67 Loss: nan
+Epoch 68 Loss: nan
+Epoch 69 Loss: nan
+Epoch 70 Loss: nan
+Epoch 71 Loss: nan
+Epoch 72 Loss: nan
+Epoch 73 Loss: nan
+Epoch 74 Loss: nan
+Epoch 75 Loss: nan
+Epoch 76 Loss: nan
+Epoch 77 Loss: nan
+Epoch 78 Loss: nan
+Epoch 79 Loss: nan
+Epoch 80 Loss: nan
+Epoch 81 Loss: nan
+Epoch 82 Loss: nan
+Epoch 83 Loss: nan
+Epoch 84 Loss: nan
+Epoch 85 Loss: nan
+Epoch 86 Loss: nan
+Epoch 87 Loss: nan
+Epoch 88 Loss: nan
+Epoch 89 Loss: nan
+Epoch 90 Loss: nan
+Epoch 91 Loss: nan
+Epoch 92 Loss: nan
+Epoch 93 Loss: nan
+Epoch 94 Loss: nan
+Epoch 95 Loss: nan
+Epoch 96 Loss: nan
+Epoch 97 Loss: nan
+Epoch 98 Loss: nan
+Epoch 99 Loss: nan
+  0%|          | 0/2653 [00:00<?, ?it/s]  0%|          | 0/2653 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "train_3.py", line 135, in <module>
+    del (support_pairs_list, support_ys_list,
+  File "/home/workspace/KDD_project/MeGCN/evaluation_v3.py", line 56, in evaluation_
+    query_y_pred = megcn.forward(support_ys, support_pair_id, query_pair_id, config['inner']) #config['inner']
+  File "/opt/conda/envs/torch1_4/lib/python3.8/site-packages/sklearn/metrics/_ranking.py", line 1616, in ndcg_score
+    y_score = check_array(y_score, ensure_2d=False)
+  File "/opt/conda/envs/torch1_4/lib/python3.8/site-packages/sklearn/utils/validation.py", line 792, in check_array
+    _assert_all_finite(array, allow_nan=force_all_finite == "allow-nan")
+  File "/opt/conda/envs/torch1_4/lib/python3.8/site-packages/sklearn/utils/validation.py", line 114, in _assert_all_finite
+    raise ValueError(
+ValueError: Input contains NaN, infinity or a value too large for dtype('float32').
