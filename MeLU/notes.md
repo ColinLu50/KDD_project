@@ -1,3 +1,50 @@
+# MeLU-1
+Task warm_state: MAE: 0.7857814431190491 NDCG1:  0.8813, nDCG3:  0.8860 NDCG5:  0.9009, nDCG10:  0.9595
+Task user_cold_state: MAE: 0.7947486639022827 NDCG1:  0.8755, nDCG3:  0.8790 NDCG5:  0.8888, nDCG10:  0.9561
+Task item_cold_state: MAE: 0.9341222643852234 NDCG1:  0.7758, nDCG3:  0.7986 NDCG5:  0.8269, nDCG10:  0.9261
+Task user_and_item_cold_state: MAE: 0.9251037240028381 NDCG1:  0.7689, nDCG3:  0.7938 NDCG5:  0.8232, nDCG10:  0.9251
+
+
+# Attetion
+## v1
+Use MLP_att
+cat all user and item feature embedding, convert to user atten and item atten
+attention nomalized by (Ndim^0.5)
+
+## v2
+remove nomailized by factor, just use softmax
+
+
+# Transfomer
+
+{num_rate : 6
+num_genre : 25
+num_director : 2186
+num_actor : 8030
+embedding_dim : 32
+first_fc_hidden_dim : 64
+second_fc_hidden_dim : 64
+num_gender : 2
+num_age : 7
+num_occupation : 21
+num_zipcode : 3402
+use_cuda : True
+inner : 5
+lr : 5e-05
+local_lr : 5e-06
+batch_size : 32
+num_epoch : 20}
+
+Task warm_state: MAE: 0.8187016844749451 NDCG1:  0.8559, nDCG3:  0.8623 NDCG5:  0.8778, nDCG10:  0.9502
+Task user_cold_state: MAE: 0.8149060606956482 NDCG1:  0.8511, nDCG3:  0.8593 NDCG5:  0.8729, nDCG10:  0.9489
+Task item_cold_state: MAE: 0.9334436655044556 NDCG1:  0.7968, nDCG3:  0.8079 NDCG5:  0.8332, nDCG10:  0.9299
+Task user_and_item_cold_state: MAE: 0.921103298664093 NDCG1:  0.7892, nDCG3:  0.8035 NDCG5:  0.8288, nDCG10:  0.9283
+
+Task warm_state: MAE: 0.7649665474891663 NDCG1:  0.8725, nDCG3:  0.8811 NDCG5:  0.8966, nDCG10:  0.9576
+Task user_cold_state: MAE: 0.8078774213790894 NDCG1:  0.8641, nDCG3:  0.8710 NDCG5:  0.8848, nDCG10:  0.9532
+Task item_cold_state: MAE: 0.9595338106155396 NDCG1:  0.7767, nDCG3:  0.8058 NDCG5:  0.8310, nDCG10:  0.9278
+Task user_and_item_cold_state: MAE: 0.9569819569587708 NDCG1:  0.7660, nDCG3:  0.7976 NDCG5:  0.8242, nDCG10:  0.9253
+
 
 
 # Dataset

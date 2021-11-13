@@ -1,0 +1,117 @@
+===============================
+num_rate : 6
+num_genre : 25
+num_director : 2186
+num_actor : 8030
+embedding_dim : 32
+first_fc_hidden_dim : 128
+second_fc_hidden_dim : 64
+num_gender : 2
+num_age : 7
+num_occupation : 21
+num_zipcode : 3402
+use_cuda : True
+inner : 5
+lr : 5e-05
+local_lr : 5e-06
+batch_size : 32
+num_epoch : 20
+['query_user_list.0.weight', 'query_user_list.1.weight', 'query_user_list.2.weight', 'query_user_list.3.weight', 'query_user_list.4.weight', 'query_user_list.5.weight', 'query_user_list.6.weight', 'query_user_list.7.weight', 'key_user_list.0.weight', 'key_user_list.1.weight', 'key_user_list.2.weight', 'key_user_list.3.weight', 'key_user_list.4.weight', 'key_user_list.5.weight', 'key_user_list.6.weight', 'key_user_list.7.weight', 'value_user_list.0.weight', 'value_user_list.1.weight', 'value_user_list.2.weight', 'value_user_list.3.weight', 'value_user_list.4.weight', 'value_user_list.5.weight', 'value_user_list.6.weight', 'value_user_list.7.weight', 'query_item_list.0.weight', 'query_item_list.1.weight', 'query_item_list.2.weight', 'query_item_list.3.weight', 'query_item_list.4.weight', 'query_item_list.5.weight', 'query_item_list.6.weight', 'query_item_list.7.weight', 'key_item_list.0.weight', 'key_item_list.1.weight', 'key_item_list.2.weight', 'key_item_list.3.weight', 'key_item_list.4.weight', 'key_item_list.5.weight', 'key_item_list.6.weight', 'key_item_list.7.weight', 'value_item_list.0.weight', 'value_item_list.1.weight', 'value_item_list.2.weight', 'value_item_list.3.weight', 'value_item_list.4.weight', 'value_item_list.5.weight', 'value_item_list.6.weight', 'value_item_list.7.weight', 'fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias', 'linear_out.weight', 'linear_out.bias']
+Epoch 0 Loss: 11.690454483032227
+==============================
+
+Task user_and_item_cold_state: MAE: 2.222957134246826 NDCG1:  0.7205, nDCG3:  0.7690 NDCG5:  0.8061, nDCG10:  0.9149
+Better value: 0.7205163669893959 Save!
+Epoch 1 Loss: 3.1312224864959717
+==============================
+
+Task user_and_item_cold_state: MAE: 1.0266542434692383 NDCG1:  0.7423, nDCG3:  0.7834 NDCG5:  0.8174, nDCG10:  0.9206
+Better value: 0.7422833102812356 Save!
+Epoch 2 Loss: 1.3208948373794556
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9473919868469238 NDCG1:  0.7428, nDCG3:  0.7858 NDCG5:  0.8174, nDCG10:  0.9211
+Better value: 0.7427616413093592 Save!
+Epoch 3 Loss: 1.2049951553344727
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9320924282073975 NDCG1:  0.7477, nDCG3:  0.7872 NDCG5:  0.8180, nDCG10:  0.9219
+Better value: 0.747706316274781 Save!
+Epoch 4 Loss: 1.1720409393310547
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9298667907714844 NDCG1:  0.7488, nDCG3:  0.7869 NDCG5:  0.8180, nDCG10:  0.9220
+Better value: 0.7488473951129554 Save!
+Epoch 5 Loss: 1.1530979871749878
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9241809248924255 NDCG1:  0.7458, nDCG3:  0.7864 NDCG5:  0.8163, nDCG10:  0.9215
+Epoch 6 Loss: 1.1451994180679321
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9221522212028503 NDCG1:  0.7460, nDCG3:  0.7858 NDCG5:  0.8174, nDCG10:  0.9216
+Epoch 7 Loss: 1.1368833780288696
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9210237264633179 NDCG1:  0.7551, nDCG3:  0.7882 NDCG5:  0.8190, nDCG10:  0.9226
+Better value: 0.7551175656984787 Save!
+Epoch 8 Loss: 1.1293004751205444
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9192765951156616 NDCG1:  0.7639, nDCG3:  0.7902 NDCG5:  0.8201, nDCG10:  0.9236
+Better value: 0.7638543107422775 Save!
+Epoch 9 Loss: 1.120321273803711
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9147201180458069 NDCG1:  0.7718, nDCG3:  0.7924 NDCG5:  0.8218, nDCG10:  0.9246
+Better value: 0.7718072844628862 Save!
+Epoch 10 Loss: 1.119009256362915
+==============================
+
+Task user_and_item_cold_state: MAE: 0.920265793800354 NDCG1:  0.7815, nDCG3:  0.7963 NDCG5:  0.8248, nDCG10:  0.9263
+Better value: 0.7814891655140618 Save!
+Epoch 11 Loss: 1.1126391887664795
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9211967587471008 NDCG1:  0.7966, nDCG3:  0.8018 NDCG5:  0.8274, nDCG10:  0.9287
+Better value: 0.7965652374366068 Save!
+Epoch 12 Loss: 1.1072137355804443
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9238362312316895 NDCG1:  0.8027, nDCG3:  0.8060 NDCG5:  0.8294, nDCG10:  0.9297
+Better value: 0.8026509912402028 Save!
+Epoch 13 Loss: 1.100653886795044
+==============================
+
+Task user_and_item_cold_state: MAE: 0.917136549949646 NDCG1:  0.8060, nDCG3:  0.8070 NDCG5:  0.8304, nDCG10:  0.9302
+Better value: 0.8060396496081144 Save!
+Epoch 14 Loss: 1.0938037633895874
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9175376296043396 NDCG1:  0.8012, nDCG3:  0.8089 NDCG5:  0.8300, nDCG10:  0.9300
+Epoch 15 Loss: 1.087712287902832
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9228477478027344 NDCG1:  0.7970, nDCG3:  0.8081 NDCG5:  0.8300, nDCG10:  0.9295
+Epoch 16 Loss: 1.0772205591201782
+==============================
+
+Task user_and_item_cold_state: MAE: 0.925916850566864 NDCG1:  0.7938, nDCG3:  0.8080 NDCG5:  0.8296, nDCG10:  0.9293
+Epoch 17 Loss: 1.0717110633850098
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9215209484100342 NDCG1:  0.7923, nDCG3:  0.8069 NDCG5:  0.8285, nDCG10:  0.9289
+Epoch 18 Loss: 1.0632684230804443
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9284197688102722 NDCG1:  0.7879, nDCG3:  0.8050 NDCG5:  0.8279, nDCG10:  0.9283
+Epoch 19 Loss: 1.050794243812561
+==============================
+
+Task user_and_item_cold_state: MAE: 0.9233996272087097 NDCG1:  0.7906, nDCG3:  0.8051 NDCG5:  0.8288, nDCG10:  0.9286
+==============================
+
+Task warm_state: MAE: 0.8055139780044556 NDCG1:  0.8544, nDCG3:  0.8645 NDCG5:  0.8787, nDCG10:  0.9507
+Task user_cold_state: MAE: 0.8072542548179626 NDCG1:  0.8499, nDCG3:  0.8592 NDCG5:  0.8743, nDCG10:  0.9491
+Task item_cold_state: MAE: 0.9354773163795471 NDCG1:  0.7903, nDCG3:  0.8076 NDCG5:  0.8330, nDCG10:  0.9293
+Task user_and_item_cold_state: MAE: 0.9233996272087097 NDCG1:  0.7906, nDCG3:  0.8051 NDCG5:  0.8288, nDCG10:  0.9286

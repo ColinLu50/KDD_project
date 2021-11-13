@@ -5,6 +5,7 @@ from copy import deepcopy
 from torch.autograd import Variable
 from torch.nn import functional as F
 from collections import OrderedDict
+from torch import nn
 
 # from embeddings import item, user
 
@@ -13,9 +14,9 @@ class GCN_Estimator(torch.nn.Module):
     def __init__(self, config, gcn_dataset):
         super(GCN_Estimator, self).__init__()
         self.embedding_dim = config['embedding_dim']
-        # self.fc1_in_dim = config['embedding_dim'] * 10
-        # self.fc2_in_dim = config['first_fc_hidden_dim']
-        # self.fc2_out_dim = config['second_fc_hidden_dim']
+        # self.fc1_in_dim = config['embedding_dim'] * 2
+        # self.fc2_in_dim = 32
+        # self.fc2_out_dim = 32
         self.use_cuda = config['use_cuda']
         self.gcn_dataset = gcn_dataset
 
@@ -44,6 +45,7 @@ class GCN_Estimator(torch.nn.Module):
         self.user_emb = torch.nn.Embedding(
             num_embeddings=self.num_users, embedding_dim=self.embedding_dim
         )
+
         self.item_emb = torch.nn.Embedding(
             num_embeddings=self.num_items, embedding_dim=self.embedding_dim
         )
@@ -52,6 +54,9 @@ class GCN_Estimator(torch.nn.Module):
             embedding_dim=self.embedding_dim
         )
 
+        nn.init.normal_(self.user_emb, std=0.1)
+        nn.init.normal_(self.item_emb, std=0.1)
+        nn.init.normal_(self.features_emb, std=0.1)
 
 
         # with torch.no_grad():
@@ -68,28 +73,16 @@ class GCN_Estimator(torch.nn.Module):
         #             self.item_gcn_emb.weight[i_id, :] = 0
 
 
-        # self.fc1 = torch.nn.Linear(self.fc1_in_dim, self.fc2_in_dim)
-        # self.fc2 = torch.nn.Linear(self.fc2_in_dim, self.fc2_out_dim)
-        # self.linear_out = torch.nn.Linear(self.fc2_out_dim, 1)
+
 
         self.gcn_layer_number = config['gcn_layer_number']
-
-        # self.layer_weight = torch.nn.Linear(
-        #         in_features=self.embedding_dim,
-        #         out_features=self.embedding_dim,
-        #         bias=False
-        #     )
-
-        # self.layer_weight = torch.nn.Linear(
-        #     in_features=self.embedding_dim,
-        #     out_features=self.embedding_dim,
-        #     bias=False
-        # )
         N = self.num_users + self.num_items + self.num_user_features + self.num_item_features
         self.layer_weight = torch.nn.Parameter(data=torch.Tensor(N, 32), requires_grad=True)
-        self.layer_weight.data.normal_(std=0.5)
+        # self.layer_weight.data.normal_(std=0.1)
 
-
+        self.fc1 = torch.nn.Linear(64, 32)
+        # self.fc2 = torch.nn.Linear(32, 32)
+        self.linear_out = torch.nn.Linear(64, 1)
 
 
 
@@ -155,12 +148,20 @@ class GCN_Estimator(torch.nn.Module):
         # user_gcn_emb = self.layer_weight(user_gcn_emb)
         # item_gcn_emb = self.layer_weight(item_gcn_emb)
 
-        inner_product = torch.mul(user_gcn_emb, item_gcn_emb)
+        # inner_product = torch.mul(user_gcn_emb, item_gcn_emb)
+        #
+        # gcn_outputs = torch.sum(inner_product, dim=1)
+        #
+        # gcn_outputs = F.softmax(gcn_outputs, dim=0) * 4 + 1
 
-        gcn_outputs = torch.sum(inner_product, dim=1)
+        X = torch.cat([user_gcn_emb, item_gcn_emb], dim=1)
+
+        X = F.relu(self.fc1(X))
+        _Y = self.linear_out(X)
 
 
-        return gcn_outputs
+
+        return _Y
 
 
 
@@ -181,7 +182,8 @@ class MetaGCN(torch.nn.Module):
         # self.local_update_target_weight_name = ['fc1.weight', 'fc1.bias', 'fc2.weight', 'fc2.bias',
         #                                         'linear_out.weight', 'linear_out.bias']
 
-        self.local_update_target_weight_name = ['layer_weight.weight']
+        self.local_update_target_weight_name = ['layer_weight.weight', 'fc1.weight', 'fc1.bias',
+                                                'linear_out.weight', 'linear_out.bias']
 
         self.A_hat_train = gcn_dataset.getSparseGraph() # cache=False
         self.gcn_dataset = gcn_dataset
@@ -289,7 +291,7 @@ class MetaGCN(torch.nn.Module):
                                             q_pair_batch[i], num_local_update)
             # TODO: get weight decay
 
-            loss_q = F.mse_loss(query_set_y_pred, q_y_batch[i]) + self.get_weights_decay_loss(q_pair_batch[i])
+            loss_q = F.mse_loss(query_set_y_pred, q_y_batch[i]) #+ self.get_weights_decay_loss(q_pair_batch[i])
             losses_q.append(loss_q)
         losses_q = torch.stack(losses_q).mean(0)
         self.meta_optim.zero_grad()

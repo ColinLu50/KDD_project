@@ -2,7 +2,7 @@ import os
 import sys
 import torch
 import pickle
-from sklearn.metrics import ndcg_score
+from sklearn.metrics import ndcg_score, mean_absolute_error
 import numpy as np
 from tqdm import tqdm
 
@@ -11,7 +11,7 @@ from options import config, states
 
 # torch.autograd.set_detect_anomaly(True)
 
-def evaluation_(megcn, master_path, log_name, update=False, test_state=None):
+def evaluation_(megcn, master_path, log_name, update=False, test_state=None, quiet=True):
     # if not os.path.exists("{}/scores/".format(master_path)):
     #     os.mkdir("{}/scores/".format(master_path))
     if config['use_cuda']:
@@ -32,8 +32,10 @@ def evaluation_(megcn, master_path, log_name, update=False, test_state=None):
         ndcg3_list = []
         ndcg5_list = []
         ndcg10_list = []
+        mae_list = []
+
         dataset_size = state_size[target_state]
-        for idx in tqdm(list(range(dataset_size)), disable=True):
+        for idx in tqdm(list(range(dataset_size)), disable=quiet):
 
             support_ys = pickle.load(open("{}/{}/supp_y_{}.pkl".format(master_path, target_state, idx), "rb")).cuda()
             # support_features = pickle.load(open("{}/{}/supp_f_{}.pkl".format(master_path, target_state, idx), "rb"))
@@ -67,9 +69,12 @@ def evaluation_(megcn, master_path, log_name, update=False, test_state=None):
             ndcg10 = ndcg_score(query_ys.view(1, -1).numpy(), query_y_pred, k=10)
             ndcg10_list.append(ndcg10)
 
+            mae = mean_absolute_error(query_y_pred, query_ys.view(1, -1).numpy())
+            mae_list.append(mae)
+
 
         # print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
-        result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
+        result_str += f'\nTask {target_state}: MAE: {np.mean(mae_list)} NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
     print(result_str)
     sys.stdout.flush()
@@ -93,13 +98,13 @@ if __name__ == "__main__":
 
     # training model.
     ml_dataset = GCNDataLoader(master_path)
-    ml_dataset.getSparseGraph(cache=False)
+    # ml_dataset.getSparseGraph(cache=False)
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/MetaGCN_v3_gcn.pkl".format(master_path)
+    model_filename = "{}/MetaGCN10_v4_smallinner_weightdecay.pkl".format(master_path)
     if not os.path.exists(model_filename):
         raise Exception(f'Model not exist in {master_path}')
     else:
         megcn = torch.load(model_filename)
         # melu.load_state_dict(trained_state_dict)
 
-    evaluation_(megcn, master_path, 'megcn_v3')
+    evaluation_(megcn, master_path, 'tmp', quiet=False)

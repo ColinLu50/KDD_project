@@ -3,38 +3,14 @@ import sys
 import torch
 import pickle
 
-from MeAtt import MeAtt
-# from options import config
+from MeAtt_final import MeAtt
+from MeAtt_config import config
 from data_generation import generate
 from evaluation_meatt import evaluation_
 import random
 random.seed(1)
 
-config = {
-    # item
-    'num_rate': 6,
-    'num_genre': 25,
-    'num_director': 2186,
-    'num_actor': 8030,
-    'embedding_dim': 64,
-    'first_fc_hidden_dim': 128,
-    'second_fc_hidden_dim': 64,
-    # user
-    'num_gender': 2,
-    'num_age': 7,
-    'num_occupation': 21,
-    'num_zipcode': 3402,
-    # cuda setting
-    'use_cuda': True,
-    # model setting
-    'inner': 5,
-    'lr': 5e-5,
-    'local_lr': 5e-6,
-    'batch_size': 32,
-    'num_epoch': 20,
-    # candidate selection
-    # 'num_candidate': 20,
-}
+
 
 
 def training(model_, total_dataset, batch_size, num_epoch, model_save=True, model_filename=None):
@@ -86,7 +62,7 @@ if __name__ == "__main__":
 
     # training model.
     melu = MeAtt(config)
-    model_filename = "{}/MeTrans64_{}.pkl".format(master_path, config['inner'])
+    model_filename = "{}/MeAtt1.pkl".format(master_path)
 
 
     # Load training dataset.
@@ -106,11 +82,11 @@ if __name__ == "__main__":
         zip(supp_xs_s, supp_ys_s, query_xs_s, query_ys_s))
     del (supp_xs_s, supp_ys_s, query_xs_s, query_ys_s)
 
-    training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
-    # training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
+    # training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
+    training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=20, model_save=True, model_filename=model_filename)
 
-    torch.save(melu, model_filename + '_final')
+    torch.save(melu, model_filename)
 
     # test_model = torch.load(model_filename)
 
-    evaluation_(melu, master_path, f'MeTrans64_{config["inner"]}')
+    evaluation_(melu, master_path, 'MeAtt1_final')

@@ -36,14 +36,14 @@ config = {
     # cuda setting
     'use_cuda': True,
     # model setting
-    'inner': 3, # update time
+    'inner': 5, # update time
     'lr': 5e-4,
     'local_lr': 5e-6,
     'batch_size': 32,
     'num_epoch': 100,
     # candidate selection
     # 'num_candidate': 20,
-    'gcn_layer_number' : 10
+    'gcn_layer_number' : 5
 }
 
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     ml_dataset.getSparseGraph()
 
     megcn = MetaGCN(config, ml_dataset)
-    model_filename = "{}/MetaGCN10_v4_smallinner_weightdecay.pkl".format(master_path)
+    model_filename = "{}/MetaGCN5-5_v5.pkl".format(master_path)
 
     print('============ Config ===============')
     for k in config:
@@ -138,5 +138,5 @@ if __name__ == "__main__":
     training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
     # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=2, model_save=True, model_filename=model_filename)
 
-    evaluation_(megcn, master_path, 'megcn10_v4_smallinner_wdecay')
+    evaluation_(megcn, master_path, 'megcn5-5_v5')
     # evaluation_(megcn, master_path, 'megcn_v3_infer')

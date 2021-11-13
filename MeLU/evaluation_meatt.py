@@ -2,16 +2,16 @@ import os
 import sys
 import torch
 import pickle
-from sklearn.metrics import ndcg_score
+from sklearn.metrics import ndcg_score, mean_absolute_error
 import numpy as np
 from tqdm import tqdm
 
 
-from options import config, states
+from MeAtt_config import config, states
 
 # torch.autograd.set_detect_anomaly(True)
 
-def evaluation_(melu, master_path, log_name, test_state=None):
+def evaluation_(melu, master_path, log_name, quiet=True, test_state=None):
     # if not os.path.exists("{}/scores/".format(master_path)):
     #     os.mkdir("{}/scores/".format(master_path))
     if config['use_cuda']:
@@ -31,8 +31,9 @@ def evaluation_(melu, master_path, log_name, test_state=None):
         ndcg3_list = []
         ndcg5_list = []
         ndcg10_list = []
+        mae_list = []
         dataset_size = int(len(os.listdir("{}/{}".format(master_path, target_state))) / 4)
-        for j in tqdm(list(range(dataset_size)), disable=True):
+        for j in tqdm(list(range(dataset_size)), disable=quiet):
             support_xs = pickle.load(open("{}/{}/supp_x_{}.pkl".format(master_path, target_state, j), "rb"))
             support_ys = pickle.load(open("{}/{}/supp_y_{}.pkl".format(master_path, target_state, j), "rb"))
             query_xs = pickle.load(open("{}/{}/query_x_{}.pkl".format(master_path, target_state, j), "rb"))
@@ -58,9 +59,12 @@ def evaluation_(melu, master_path, log_name, test_state=None):
             ndcg10 = ndcg_score(query_ys.view(1, -1).numpy(), query_y_pred, k=10)
             ndcg10_list.append(ndcg10)
 
+            mae = mean_absolute_error(query_ys.view(1, -1).numpy(), query_y_pred)
+            mae_list.append(mae)
 
-        print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
-        result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
+
+        # print(f'Task {target_state}: MAE: {np.mean(mae_list)} NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
+        result_str += f'\nTask {target_state}: MAE: {np.mean(mae_list)} NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
     print('=' * 30)
     print(result_str)
@@ -79,22 +83,23 @@ def evaluation_(melu, master_path, log_name, test_state=None):
 
 
 if __name__ == "__main__":
-    from MeLU import MeLU
+    from MeAtt_final import MeAtt
 
     master_path = "/home/workspace/big_data/KDD_projects_data/ml1m"
 
     # training model.
     # melu = MeLU(config)
-    model_filename = "{}/MeLU5_test.pkl".format(master_path)
+    model_filename = "{}/MeAtt5_v3.pkl".format(master_path)
     if not os.path.exists(model_filename):
         raise Exception(f'Model not exist in {master_path}')
     else:
-        melu = torch.load(model_filename)
+        meatt = torch.load(model_filename)
         # melu.load_state_dict(trained_state_dict)
 
+    print('Start Evaluation')
 
-    evaluation_(melu, master_path, 'melu5_test_evl')
-    melu3 = MeLU(config)
-    melu.load_state_dict(torch.load("{}/MeLU5_test_state.pkl".format(master_path)))
-    melu.store_parameters()
-    evaluation_(melu3, master_path, 'melu5_test_evl')
+    evaluation_(meatt, master_path, 'meatt5_evl', quiet=False)
+    # melu3 = MeLU(config)
+    # melu.load_state_dict(torch.load("{}/MeLU5_test_state.pkl".format(master_path)))
+    # melu.store_parameters()
+    # evaluation_(melu3, master_path, 'melu5_test_evl')

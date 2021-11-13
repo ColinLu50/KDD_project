@@ -1,7 +1,7 @@
 import os
 import torch
 import pickle
-from sklearn.metrics import ndcg_score
+from sklearn.metrics import ndcg_score, mean_absolute_error
 import numpy as np
 from tqdm import tqdm
 
@@ -24,6 +24,8 @@ def evaluation_(melu, master_path, log_name):
         ndcg3_list = []
         ndcg5_list = []
         ndcg10_list = []
+        mae_list = []
+
         dataset_size = int(len(os.listdir("{}/{}".format(master_path, target_state))) / 4)
         for j in tqdm(list(range(dataset_size))):
             support_xs = pickle.load(open("{}/{}/supp_x_{}.pkl".format(master_path, target_state, j), "rb"))
@@ -51,9 +53,12 @@ def evaluation_(melu, master_path, log_name):
             ndcg10 = ndcg_score(query_ys.view(1, -1).numpy(), query_y_pred, k=10)
             ndcg10_list.append(ndcg10)
 
+            mae = mean_absolute_error(query_ys.view(1, -1).numpy(), query_y_pred)
+            mae_list.append(mae)
 
-        print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
-        result_str += f'\nTask {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
+
+        # print(f'Task {target_state}, NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}')
+        result_str += f'\nTask {target_state}: MAE: {np.mean(mae_list)} NDCG1: {np.mean(ndcg1_list) : .4f}, nDCG3: {np.mean(ndcg3_list) : .4f} NDCG5: {np.mean(ndcg5_list) : .4f}, nDCG10: {np.mean(ndcg10_list) : .4f}'
 
     print('=' * 30)
     print(result_str)
@@ -82,7 +87,3 @@ if __name__ == "__main__":
 
 
     evaluation_(melu, master_path, 'melu5_test_evl')
-    melu3 = MeLU(config)
-    melu.load_state_dict(torch.load("{}/MeLU5_test_state.pkl".format(master_path)))
-    melu.store_parameters()
-    evaluation_(melu3, master_path, 'melu5_test_evl')

@@ -38,14 +38,8 @@ if __name__ == "__main__":
         zip(supp_xs_s, supp_ys_s, query_xs_s, query_ys_s))
     del (supp_xs_s, supp_ys_s, query_xs_s, query_ys_s)
 
-    # training(megcn, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
-    training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
+    training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=config['num_epoch'], model_save=True, model_filename=model_filename)
+    # training(melu, total_dataset, batch_size=config['batch_size'], num_epoch=1, model_save=True, model_filename=model_filename)
 
-    torch.save(melu.state_dict(), "{}/MeLU5_test_state.pkl".format(master_path))
-    # evaluation_(melu, master_path, 'test1')
-
-    # melu = MeLU(config)
-    melu = torch.load(model_filename)
-    # melu.load_state_dict(trained_state_dict)
-
-    # evaluation_(melu, master_path, 'test2')
+    torch.save(melu, "{}/MeLU1.pkl".format(master_path))
+    evaluation_(melu, master_path, 'MeLU1')
