@@ -27,9 +27,9 @@ config = {
     # cuda setting
     'use_cuda': True,
     # model setting
-    'inner': 5,
+    'inner': 20,
     'lr': 5e-5,
-    'local_lr': 5e-6,
+    'local_lr': 5e-5,
     'batch_size': 32,
     'num_epoch': 20,
     # candidate selection
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     # training model.
     melu = MeAtt(config)
-    model_filename = "{}/MeTrans64_{}.pkl".format(master_path, config['inner'])
+    model_filename = "{}/MeT64_V1_{}.pkl".format(master_path, config['inner'])
 
 
     # Load training dataset.
@@ -113,4 +113,4 @@ if __name__ == "__main__":
 
     # test_model = torch.load(model_filename)
 
-    evaluation_(melu, master_path, f'MeTrans64_{config["inner"]}')
+    evaluation_(melu, master_path, f'MeT64_V1_{config["inner"]}')

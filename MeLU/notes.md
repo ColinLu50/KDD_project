@@ -45,7 +45,14 @@ Task user_cold_state: MAE: 0.8078774213790894 NDCG1:  0.8641, nDCG3:  0.8710 NDC
 Task item_cold_state: MAE: 0.9595338106155396 NDCG1:  0.7767, nDCG3:  0.8058 NDCG5:  0.8310, nDCG10:  0.9278
 Task user_and_item_cold_state: MAE: 0.9569819569587708 NDCG1:  0.7660, nDCG3:  0.7976 NDCG5:  0.8242, nDCG10:  0.9253
 
+# Optimized Transfomer
 
+## V1: local update decision
+
+## V2: 
+- local update all layer except emb
+- inner loop hight lr 
+- high inner loop 15
 
 # Dataset
 

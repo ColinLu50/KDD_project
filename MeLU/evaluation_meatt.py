@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     # training model.
     # melu = MeLU(config)
-    model_filename = "{}/MeAtt5_v3.pkl".format(master_path)
+    model_filename = "{}/MeTrans64_15.pkl".format(master_path)
     if not os.path.exists(model_filename):
         raise Exception(f'Model not exist in {master_path}')
     else:
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     print('Start Evaluation')
 
-    evaluation_(meatt, master_path, 'meatt5_evl', quiet=False)
+    evaluation_(meatt, master_path, 'MeTrans64_15_evl', quiet=False)
     # melu3 = MeLU(config)
     # melu.load_state_dict(torch.load("{}/MeLU5_test_state.pkl".format(master_path)))
     # melu.store_parameters()

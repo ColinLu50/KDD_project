@@ -104,3 +104,9 @@ Epoch 19 Loss: 1.058571696281433
 ==============================
 
 Task user_and_item_cold_state: MAE: 0.9269327521324158 NDCG1:  0.7897, nDCG3:  0.8076 NDCG5:  0.8313, nDCG10:  0.9293
+==============================
+
+Task warm_state: MAE: 0.8095936179161072 NDCG1:  0.8498, nDCG3:  0.8614 NDCG5:  0.8772, nDCG10:  0.9496
+Task user_cold_state: MAE: 0.81227707862854 NDCG1:  0.8426, nDCG3:  0.8548 NDCG5:  0.8718, nDCG10:  0.9476
+Task item_cold_state: MAE: 0.9367386698722839 NDCG1:  0.7941, nDCG3:  0.8096 NDCG5:  0.8359, nDCG10:  0.9302
+Task user_and_item_cold_state: MAE: 0.9269327521324158 NDCG1:  0.7897, nDCG3:  0.8076 NDCG5:  0.8313, nDCG10:  0.9293
